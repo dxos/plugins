@@ -1,0 +1,19 @@
+version: 1
+
+package:
+  plugins:
+    - id: org.dxos.plugin.excalidraw
+      name: Excalidraw
+      description: |-
+        Professional diagramming powered by Excalidraw for creating hand-drawn style illustrations.
+        Build flowcharts, wireframes, and technical diagrams with a rich set of shapes and styling options.
+      icon: ph--compass-tool--regular
+      iconHue: indigo
+      source: https://github.com/dxos/plugin-excalidraw
+      tags:
+        - labs
+      screenshots:
+        - https://dxos.network/plugin-details-excalidraw-dark.png
+      build:
+        command: vite build
+        outdir: dist

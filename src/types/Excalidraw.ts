@@ -13,8 +13,8 @@
 
 import * as Schema from 'effect/Schema';
 
-import { Annotation, Obj, Ref, Type } from '@dxos/echo';
-import { FormInputAnnotation, SystemTypeAnnotation } from '@dxos/echo/internal';
+import { Annotation, DXN, Obj, Ref, Type } from '@dxos/echo';
+import { FormInputAnnotation, HiddenAnnotation } from '@dxos/echo/internal';
 
 /** Schema identifier embedded in the persisted canvas payload. */
 export const EXCALIDRAW_SCHEMA = 'excalidraw.com/2';
@@ -29,29 +29,23 @@ export const Canvas = Schema.Struct({
   schema: Schema.String.pipe(Schema.optional),
   content: Schema.Record({ key: Schema.String, value: Schema.Any }),
 }).pipe(
-  Type.object({
-    typename: 'org.dxos.type.excalidraw.canvas',
-    version: '0.1.0',
-  }),
-  SystemTypeAnnotation.set(true),
+  HiddenAnnotation.set(true),
+  Type.makeObject(DXN.make('org.dxos.type.excalidraw.canvas', '0.1.0')),
 );
-export interface Canvas extends Schema.Schema.Type<typeof Canvas> {}
+export type Canvas = Type.InstanceType<typeof Canvas>;
 
 /** The user-facing Excalidraw object — a named handle around a canvas. */
 export const Excalidraw = Schema.Struct({
   name: Schema.String.pipe(Schema.optional),
   canvas: Ref.Ref(Canvas).pipe(FormInputAnnotation.set(false)),
 }).pipe(
-  Type.object({
-    typename: 'org.dxos.type.excalidraw',
-    version: '0.1.0',
-  }),
   Annotation.IconAnnotation.set({
     icon: 'ph--compass-tool--regular',
     hue: 'indigo',
   }),
+  Type.makeObject(DXN.make('org.dxos.type.excalidraw', '0.1.0')),
 );
-export interface Excalidraw extends Schema.Schema.Type<typeof Excalidraw> {}
+export type Excalidraw = Type.InstanceType<typeof Excalidraw>;
 
 export type ExcalidrawProps = Omit<Obj.MakeProps<typeof Excalidraw>, 'canvas'> & {
   canvas?: Partial<Obj.MakeProps<typeof Canvas>>;

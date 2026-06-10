@@ -12,8 +12,7 @@ import '@excalidraw/excalidraw/index.css';
 import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
 
 import { type AppSurface } from '@dxos/app-toolkit/ui';
-import { Flex, Panel, useThemeContext } from '@dxos/react-ui';
-import { composable, composableProps } from '@dxos/ui-theme';
+import { Flex, Panel, composable, composableProps, useThemeContext } from '@dxos/react-ui';
 
 import { useStoreAdapter } from '#hooks';
 import { type Excalidraw as ExcalidrawTypes, type Settings } from '#types';

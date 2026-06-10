@@ -8,9 +8,6 @@ import wasm from 'vite-plugin-wasm';
 
 import { composerPlugin } from '@dxos/app-framework/vite-plugin';
 
-import { version } from './package.json' with { type: 'json' };
-import { meta } from './src/meta';
-
 export default defineConfig({
   // Prepend `source` so `#xxx` imports route to `src/*.ts` — the dist paths
   // in `package.json#imports` only kick in if this plugin is republished as
@@ -21,7 +18,7 @@ export default defineConfig({
     conditions: ['source', 'module', 'browser', 'development', 'production', 'import'],
   },
   plugins: [
-    ...composerPlugin({ entry: 'src/ExcalidrawPlugin.tsx', meta: { ...meta, version } }),
+    ...composerPlugin({ entry: 'src/ExcalidrawPlugin.tsx' }),
     react(),
     wasm(),
   ],
