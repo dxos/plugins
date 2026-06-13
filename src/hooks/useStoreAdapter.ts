@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { createDocAccessor } from '@dxos/echo-db';
+import { createDocAccessor } from '@dxos/echo-client';
 import { useObject } from '@dxos/echo-react';
 
 import { type Excalidraw } from '#types';
