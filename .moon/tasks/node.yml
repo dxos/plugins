@@ -1,0 +1,39 @@
+# https://moonrepo.dev/docs/config/tasks
+# Inherited by every project on the `node` toolchain (all plugins). A plugin's moon.yml only
+# declares `layer`/`language`; these tasks come for free.
+$schema: https://moonrepo.dev/schemas/tasks.json
+
+fileGroups:
+  sources:
+    - 'src/**/*'
+
+tasks:
+  typecheck:
+    command: 'pnpm exec tsc --noEmit'
+    inputs:
+      - '@group(sources)'
+      - 'tsconfig.json'
+      - '/tsconfig.base.json'
+
+  # `vite build` runs `composerPlugin`, emitting dist/manifest.json (incl. the resolved
+  # `dependencies` SDK-compat snapshot) alongside the bundle.
+  build:
+    command: 'pnpm exec vite build'
+    deps:
+      - '~:typecheck'
+    inputs:
+      - '@group(sources)'
+      - 'vite.config.ts'
+      - 'dx.yml'
+      - 'tsconfig.json'
+      - 'package.json'
+    outputs:
+      - 'dist'
+
+  dev:
+    command: 'pnpm exec vite'
+    preset: 'server'
+
+  preview:
+    command: 'pnpm exec vite preview'
+    preset: 'server'

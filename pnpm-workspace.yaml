@@ -1,0 +1,36 @@
+# Composer community plugins — pnpm workspace.
+#
+# Every plugin under plugins/* pins the DXOS SDK via the `dxos` named catalog below.
+# The SDK ships as a single unit, so one find-replace of the version/commit here bumps
+# every plugin in lockstep.
+#
+# `main` tracks the latest DXOS build via pkg.pr.new (the nightly "SDK upgrade" PR), but
+# releases require a published npm version — the release workflow refuses to publish a
+# plugin while the `dxos` catalog points at a pkg.pr.new / prerelease pin. See RELEASING.md.
+
+packages:
+  - 'packages/*'
+
+catalogs:
+  dxos:
+    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@ac4609ee8e'
+    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@ac4609ee8e'
+    '@dxos/async': 'https://pkg.pr.new/dxos/dxos/@dxos/async@ac4609ee8e'
+    '@dxos/client': 'https://pkg.pr.new/dxos/dxos/@dxos/client@ac4609ee8e'
+    '@dxos/client-protocol': 'https://pkg.pr.new/dxos/dxos/@dxos/client-protocol@ac4609ee8e'
+    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@ac4609ee8e'
+    '@dxos/context': 'https://pkg.pr.new/dxos/dxos/@dxos/context@ac4609ee8e'
+    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@ac4609ee8e'
+    '@dxos/echo-client': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-client@ac4609ee8e'
+    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@ac4609ee8e'
+    '@dxos/effect': 'https://pkg.pr.new/dxos/dxos/@dxos/effect@ac4609ee8e'
+    '@dxos/invariant': 'https://pkg.pr.new/dxos/dxos/@dxos/invariant@ac4609ee8e'
+    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@ac4609ee8e'
+    '@dxos/operation': 'https://pkg.pr.new/dxos/dxos/@dxos/operation@ac4609ee8e'
+    '@dxos/plugin-space': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-space@ac4609ee8e'
+    '@dxos/react-client': 'https://pkg.pr.new/dxos/dxos/@dxos/react-client@ac4609ee8e'
+    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@ac4609ee8e'
+    '@dxos/react-ui-form': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-form@ac4609ee8e'
+    '@dxos/react-ui-stack': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-stack@ac4609ee8e'
+    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@ac4609ee8e'
+    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@ac4609ee8e'
