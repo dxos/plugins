@@ -15,4 +15,8 @@ export default defineConfig({
     tags: ['labs'],
     screenshots: [{ dark: 'https://dxos.network/plugin-details-excalidraw-dark.png' }],
   },
+  publish: {
+    buildCommand: 'vite build',
+    outdir: 'dist',
+  },
 });
