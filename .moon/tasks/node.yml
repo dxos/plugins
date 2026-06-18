@@ -24,7 +24,7 @@ tasks:
     inputs:
       - '@group(sources)'
       - 'vite.config.ts'
-      - 'dx.yml'
+      - 'dx.config.ts'
       - 'tsconfig.json'
       - 'package.json'
     outputs:
