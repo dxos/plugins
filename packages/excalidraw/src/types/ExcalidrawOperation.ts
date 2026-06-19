@@ -13,7 +13,7 @@ import { meta } from '#meta';
 
 import * as Excalidraw from './Excalidraw';
 
-const EXCALIDRAW_OPERATION = `${meta.id}.operation`;
+const EXCALIDRAW_OPERATION = `${meta.profile.key}.operation`;
 
 export const Create = Operation.make({
   meta: { key: DXN.make(`${EXCALIDRAW_OPERATION}.create`), name: 'Create Excalidraw' },

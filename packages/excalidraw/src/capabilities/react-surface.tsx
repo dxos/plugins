@@ -20,9 +20,11 @@ export default Capability.makeModule(() =>
       Surface.create({
         id: 'sketch',
         // TODO(wittjosiah): Split into multiple surfaces if this filter proves too strict for non-article roles.
-        role: ['article', 'section', 'slide'],
-        filter: (data): data is { subject: Excalidraw.Excalidraw; attendableId: string } =>
-          typeof data.attendableId === 'string' && Excalidraw.isExcalidraw(data.subject),
+        filter: AppSurface.oneOf(
+          AppSurface.object(AppSurface.Article, Excalidraw.Excalidraw),
+          AppSurface.object(AppSurface.Section, Excalidraw.Excalidraw),
+          AppSurface.object(AppSurface.Slide, Excalidraw.Excalidraw),
+        ),
         component: ({ data: { subject, attendableId }, role }) => {
           const settings = useAtomCapability(ExcalidrawCapabilities.Settings);
           return <SketchContainer role={role} subject={subject} attendableId={attendableId} settings={settings} />;
@@ -30,7 +32,7 @@ export default Capability.makeModule(() =>
       }),
       Surface.create({
         id: 'pluginSettings',
-        filter: AppSurface.settings(AppSurface.Article, meta.id),
+        filter: AppSurface.settings(AppSurface.Article, meta.profile.key),
         component: ({ data: { subject } }) => {
           const { settings, updateSettings } = useSettingsState<Settings.Settings>(subject.atom);
           return <SketchSettings settings={settings} onSettingsChange={updateSettings} />;

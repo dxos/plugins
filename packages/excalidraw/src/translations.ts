@@ -22,7 +22,7 @@ export const translations = [
         'delete-object.label': 'Delete excalidraw',
         'object-deleted.label': 'Excalidraw deleted',
       },
-      [meta.id]: {
+      [meta.profile.key]: {
         'plugin.name': 'Sketch',
         'settings.title': 'Sketch settings',
         'settings.hover-tools.label': 'Auto hide controls',

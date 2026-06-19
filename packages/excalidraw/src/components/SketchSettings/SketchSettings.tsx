@@ -14,11 +14,11 @@ import { type Settings } from '#types';
 export type SketchSettingsProps = AppSurface.SettingsArticleProps<Settings.Settings>;
 
 export const SketchSettings = ({ settings, onSettingsChange }: SketchSettingsProps) => {
-  const { t } = useTranslation(meta.id);
+  const { t } = useTranslation(meta.profile.key);
 
   return (
     <SettingsForm.Viewport>
-      <SettingsForm.Section title={t('settings.title', { ns: meta.id })}>
+      <SettingsForm.Section title={t('settings.title', { ns: meta.profile.key })}>
         <SettingsForm.Item title={t('settings.hover-tools.label')} description={t('settings.hover-tools.description')}>
           <Input.Switch
             disabled={!onSettingsChange}

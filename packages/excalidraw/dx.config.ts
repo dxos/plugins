@@ -2,11 +2,11 @@
 // Copyright 2026 DXOS.org
 //
 
-import { defineConfig } from '@dxos/app-framework';
+import { Config2 } from '@dxos/app-framework/config';
 
-export default defineConfig({
+export default Config2.make({
   plugin: {
-    id: 'org.dxos.plugin.excalidraw',
+    key: 'org.dxos.plugin.excalidraw',
     name: 'Excalidraw',
     description:
       'Professional diagramming powered by Excalidraw for creating hand-drawn style illustrations.\nBuild flowcharts, wireframes, and technical diagrams with a rich set of shapes and styling options.',
@@ -17,6 +17,6 @@ export default defineConfig({
   },
   publish: {
     buildCommand: 'vite build',
-    outdir: 'dist',
+    outputDirectory: 'dist',
   },
 });
