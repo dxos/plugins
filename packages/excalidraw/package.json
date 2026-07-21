@@ -1,7 +1,7 @@
 {
   "name": "dxos-plugin-excalidraw",
   "private": true,
-  "version": "0.1.27",
+  "version": "0.1.28",
   "description": "Excalidraw sketch plugin for DXOS Composer — standalone community distribution of the @dxos/plugin-excalidraw package.",
   "type": "module",
   "scripts": {
