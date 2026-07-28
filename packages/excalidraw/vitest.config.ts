@@ -3,33 +3,36 @@
 //
 
 import react from '@vitejs/plugin-react';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import wasm from 'vite-plugin-wasm';
 import { defineConfig } from 'vitest/config';
 
-// `source` mirrors vite.config.ts so `#xxx` subpath imports resolve to src/* rather than the dist
-// paths in package.json#imports, which only exist after a build.
-const conditions = ['source', 'module', 'development', 'production', 'import'];
+const here = (path: string) => resolve(fileURLToPath(new URL('.', import.meta.url)), path);
 
-const TIKTOKEN_STUB = new URL('./vitest/tiktoken-stub.mjs', import.meta.url).pathname;
+// `#xxx` subpath imports are aliased explicitly rather than via a global `source` resolve condition:
+// package.json#imports points them at dist paths that only exist after a build, but applying `source`
+// globally also redirects third-party packages (react-aria-components -> react-aria) to TypeScript
+// their published tarballs do not ship. Everything outside this plugin resolves normally.
+const pluginImports = {
+  '#capabilities': here('src/capabilities/index.ts'),
+  '#components': here('src/components/index.ts'),
+  '#containers': here('src/containers/index.ts'),
+  '#hooks': here('src/hooks/index.ts'),
+  '#meta': here('src/meta.ts'),
+  '#operations': here('src/operations/index.ts'),
+  '#plugin': here('src/ExcalidrawPlugin.tsx'),
+  '#translations': here('src/translations.ts'),
+  '#types': here('src/types/index.ts'),
+};
 
 export default defineConfig({
   plugins: [react(), wasm()],
-  resolve: {
-    conditions: [...conditions, 'browser'],
-    alias: { 'tiktoken/lite': TIKTOKEN_STUB },
-  },
-  ssr: {
-    // Tests run in node, so `node` must win over `browser` — @dxos/async extends node stream classes
-    // that the browser shims leave undefined.
-    resolve: { conditions: ['node', ...conditions] },
-    // The `source` condition points @dxos/* at TypeScript inside node_modules, which node cannot
-    // strip types from; they have to go through vite's transform rather than being externalized.
-    noExternal: [/@dxos\//, /@excalidraw\//],
-  },
+  resolve: { alias: pluginImports },
+  // @dxos/lit-ui ships `.pcss` alongside its JS; externalized, node tries to load those directly and
+  // fails on the extension, so the @dxos packages go through vite's transform instead.
+  ssr: { noExternal: [/@dxos\//] },
   test: {
-    // Everything resolves from source, so externalizing anything hands node an untransformed module
-    // (TypeScript, CSS) and fails with an unlocatable syntax error.
-    server: { deps: { inline: true } },
     include: ['src/**/*.test.{ts,tsx}'],
   },
 });

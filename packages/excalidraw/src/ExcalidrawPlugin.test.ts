@@ -4,19 +4,37 @@
 
 import { describe, test } from 'vitest';
 
+import { ActivationEvents } from '@dxos/app-framework';
+import { createTestApp } from '@dxos/app-framework/testing';
+import { AppActivationEvents } from '@dxos/app-toolkit';
 import { Obj } from '@dxos/echo';
+
+import { ExcalidrawPlugin } from '#plugin';
 
 import { meta } from './meta';
 import { Excalidraw } from './types';
 
-// The nightly SDK bump auto-merges on a green CI, so these cover SDK-coupled surfaces that an SDK
-// change can break while still typechecking: plugin metadata derived from dx.config, and ECHO object
-// construction (which is what a duplicated `effect` or `@automerge/automerge` instance breaks).
-//
-// A module-activation test — the `createTestApp` pattern every plugin has in the dxos monorepo — is
-// not here yet: importing the plugin implementation pulls in @dxos/react-ui and @dxos/ai, which do
-// not load under vitest outside that monorepo without porting its vite test configuration.
+const moduleId = (name: string) => `${meta.profile.key}.module.${name}`;
+
+// The nightly SDK bump auto-merges on a green CI, so these cover the surfaces an SDK change can break
+// while still typechecking: module activation, plugin metadata derived from dx.config, and ECHO
+// object construction (what a duplicated `effect` or `@automerge/automerge` instance breaks).
 describe('ExcalidrawPlugin', () => {
+  test('modules activate on the expected events', { timeout: 60_000 }, async ({ expect }) => {
+    await using harness = await createTestApp({ plugins: [ExcalidrawPlugin()] });
+
+    // Surfaces are active after a normal startup.
+    expect(harness.manager.getActive()).toContain(moduleId('ReactSurface'));
+
+    // The schema and create-object modules wait on SetupSchema, which ClientPlugin fires in a real app.
+    await harness.fire(AppActivationEvents.SetupSchema);
+    expect(harness.manager.getActive()).toEqual(expect.arrayContaining([moduleId('CreateObject'), moduleId('schema')]));
+
+    // Operation handlers are not loaded on startup — SetupProcessManager fires lazily when an operation is invoked.
+    await harness.fire(ActivationEvents.SetupProcessManager);
+    expect(harness.manager.getActive()).toContain(moduleId('OperationHandler'));
+  });
+
   test('meta derives from dx.config', ({ expect }) => {
     expect(meta.profile.key).toBe('org.dxos.plugin.excalidraw');
     expect(meta.profile.name).toBe('Excalidraw');
