@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # moon resolves a merge base against the PR's base ref to compute touched files, which a
+          # shallow clone cannot do — the base branch is not in the object store.
+          fetch-depth: 0
       # Installs proto + the toolchain pinned in .prototools (node, pnpm, moon) and runs pnpm install.
       - uses: moonrepo/setup-toolchain@v0
         with:

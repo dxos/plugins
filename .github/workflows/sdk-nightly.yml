@@ -19,9 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Seven characters exactly: pkg.pr.new emits 7-char SHAs in the @dxos/* cross-package
+      # dependency URLs, and pnpm keys resolutions on the literal URL — a longer pin resolves
+      # to the same build but installs a second, duplicate copy of the whole SDK.
       - name: Resolve latest dxos main commit
         id: sha
-        run: echo "sha=$(git ls-remote https://github.com/dxos/dxos.git refs/heads/main | cut -c1-10)" >> "$GITHUB_OUTPUT"
+        run: echo "sha=$(git ls-remote https://github.com/dxos/dxos.git refs/heads/main | cut -c1-7)" >> "$GITHUB_OUTPUT"
       - uses: moonrepo/setup-toolchain@v0
       - name: Point the dxos catalog at the latest pkg.pr.new build
         run: node scripts/set-sdk.mjs pkg-pr-new ${{ steps.sha.outputs.sha }}

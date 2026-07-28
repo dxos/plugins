@@ -1,6 +1,6 @@
 # Composer community plugins — pnpm workspace.
 #
-# Every plugin under plugins/* pins the DXOS SDK via the `dxos` named catalog below.
+# Every plugin under packages/* pins the DXOS SDK via the `dxos` named catalog below.
 # The SDK ships as a single unit, so one find-replace of the version/commit here bumps
 # every plugin in lockstep.
 #
@@ -13,24 +13,24 @@ packages:
 
 catalogs:
   dxos:
-    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@d94a5c53a2'
-    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@d94a5c53a2'
-    '@dxos/async': 'https://pkg.pr.new/dxos/dxos/@dxos/async@d94a5c53a2'
-    '@dxos/client': 'https://pkg.pr.new/dxos/dxos/@dxos/client@d94a5c53a2'
-    '@dxos/client-protocol': 'https://pkg.pr.new/dxos/dxos/@dxos/client-protocol@d94a5c53a2'
-    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@d94a5c53a2'
-    '@dxos/context': 'https://pkg.pr.new/dxos/dxos/@dxos/context@d94a5c53a2'
-    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@d94a5c53a2'
-    '@dxos/echo-client': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-client@d94a5c53a2'
-    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@d94a5c53a2'
-    '@dxos/effect': 'https://pkg.pr.new/dxos/dxos/@dxos/effect@d94a5c53a2'
-    '@dxos/invariant': 'https://pkg.pr.new/dxos/dxos/@dxos/invariant@d94a5c53a2'
-    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@d94a5c53a2'
-    '@dxos/operation': 'https://pkg.pr.new/dxos/dxos/@dxos/operation@d94a5c53a2'
-    '@dxos/plugin-space': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-space@d94a5c53a2'
-    '@dxos/react-client': 'https://pkg.pr.new/dxos/dxos/@dxos/react-client@d94a5c53a2'
-    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@d94a5c53a2'
-    '@dxos/react-ui-form': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-form@d94a5c53a2'
-    '@dxos/react-ui-stack': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-stack@d94a5c53a2'
-    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@d94a5c53a2'
-    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@d94a5c53a2'
+    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@59f470a'
+    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@59f470a'
+    '@dxos/async': 'https://pkg.pr.new/dxos/dxos/@dxos/async@59f470a'
+    '@dxos/client': 'https://pkg.pr.new/dxos/dxos/@dxos/client@59f470a'
+    '@dxos/client-protocol': 'https://pkg.pr.new/dxos/dxos/@dxos/client-protocol@59f470a'
+    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@59f470a'
+    '@dxos/context': 'https://pkg.pr.new/dxos/dxos/@dxos/context@59f470a'
+    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@59f470a'
+    '@dxos/echo-client': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-client@59f470a'
+    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@59f470a'
+    '@dxos/effect': 'https://pkg.pr.new/dxos/dxos/@dxos/effect@59f470a'
+    '@dxos/invariant': 'https://pkg.pr.new/dxos/dxos/@dxos/invariant@59f470a'
+    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@59f470a'
+    '@dxos/operation': 'https://pkg.pr.new/dxos/dxos/@dxos/operation@59f470a'
+    '@dxos/plugin-space': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-space@59f470a'
+    '@dxos/react-client': 'https://pkg.pr.new/dxos/dxos/@dxos/react-client@59f470a'
+    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@59f470a'
+    '@dxos/react-ui-form': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-form@59f470a'
+    '@dxos/react-ui-stack': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-stack@59f470a'
+    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@59f470a'
+    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@59f470a'
