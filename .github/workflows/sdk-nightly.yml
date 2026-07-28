@@ -1,0 +1,59 @@
+name: SDK nightly (pkg.pr.new)
+
+# Tracks the latest DXOS `main` build so the monorepo keeps pace with the SDK. Opens/updates a
+# single "SDK upgrade" PR pointing the `dxos` catalog at the latest pkg.pr.new build. These pins
+# may merge to `main` (keeps CI building against the latest SDK), but the release workflow refuses
+# to publish against a pkg.pr.new pin — a published npm SDK release goes through `sdk-npm-release`.
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Seven characters exactly: pkg.pr.new emits 7-char SHAs in the @dxos/* cross-package
+      # dependency URLs, and pnpm keys resolutions on the literal URL — a longer pin resolves
+      # to the same build but installs a second, duplicate copy of the whole SDK.
+      - name: Resolve latest dxos main commit
+        id: sha
+        run: echo "sha=$(git ls-remote https://github.com/dxos/dxos.git refs/heads/main | cut -c1-7)" >> "$GITHUB_OUTPUT"
+      - uses: moonrepo/setup-toolchain@v0
+      - name: Point the dxos catalog at the latest pkg.pr.new build
+        run: node scripts/set-sdk.mjs pkg-pr-new ${{ steps.sha.outputs.sha }}
+      - run: pnpm install --no-frozen-lockfile
+      - run: moon run :build
+      - name: Open/update the SDK upgrade PR
+        id: pr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: sdk-upgrade
+          commit-message: 'chore(sdk): track dxos/main@${{ steps.sha.outputs.sha }}'
+          title: 'chore(sdk): track dxos/main@${{ steps.sha.outputs.sha }}'
+          body: |
+            Nightly SDK tracking — points the `dxos` catalog at the latest dxos `main` build on
+            pkg.pr.new and rebuilds every plugin.
+
+            **Not releasable:** the release workflow refuses to publish while the catalog is a
+            pkg.pr.new pin. Merging keeps `main` building against the latest SDK; publish a real
+            release via the **SDK npm release** workflow once DXOS cuts an npm version.
+
+            Auto-merge is enabled — this lands on its own once CI is green.
+
+      # The diff is 21 identical URL substitutions plus a lockfile, which is exactly the review a
+      # human rubber-stamps. `main` never publishes and the release guard blocks releasing from a
+      # pkg.pr.new pin, so the worst case is a rolling pin that the next nightly replaces.
+      # Requires `allow_auto_merge` on the repository and a required status check on `main`;
+      # without a required check GitHub merges immediately rather than waiting for CI.
+      - name: Enable auto-merge
+        if: steps.pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"

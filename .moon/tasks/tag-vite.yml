@@ -1,0 +1,14 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+tasks:
+  dev:
+    command: pnpm exec vite
+    preset: server
+
+  preview:
+    command: pnpm exec vite preview
+    deps:
+      - ~:build
+    preset: server
+
+inheritedBy:
+  tags: vite

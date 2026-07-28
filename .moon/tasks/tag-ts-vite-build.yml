@@ -1,0 +1,21 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+tasks:
+  # `vite build` runs `composerPlugin`, emitting dist/manifest.json (incl. the resolved
+  # `dependencies` SDK-compat snapshot) alongside the bundle.
+  build:
+    command: pnpm exec vite build
+    deps:
+      - ~:typecheck
+    inputs:
+      - /tsconfig.base.json
+      - tsconfig.json
+      - vite.config.ts
+      - dx.config.ts
+      - '@group(production)'
+    outputs:
+      - dist
+    options:
+      timeout: 120
+
+inheritedBy:
+  tags: ts-vite-build
