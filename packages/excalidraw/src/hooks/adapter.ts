@@ -4,10 +4,9 @@
 
 import { type ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
 
+import { AbstractStoreAdapter, type Batch } from '@dxos/echo-doc';
 import { log } from '@dxos/log';
 import { isNonNullable } from '@dxos/util';
-
-import { AbstractAutomergeStoreAdapter, type Batch } from '../util';
 
 export type ExcalidrawStoreAdapterProps = {
   onUpdate?: (update: { elements: ExcalidrawElement[] }) => void;
@@ -20,7 +19,7 @@ export type ExcalidrawStoreAdapterProps = {
  * - https://github.com/loro-dev/loro-excalidraw/blob/main/src/App.tsx
  * - https://github.com/excalidraw/excalidraw/blob/master/dev-docs/docs/codebase/json-schema.mdx
  */
-export class ExcalidrawStoreAdapter extends AbstractAutomergeStoreAdapter<ExcalidrawElement> {
+export class ExcalidrawStoreAdapter extends AbstractStoreAdapter<ExcalidrawElement> {
   // NOTE: Elements are mutable by the component so need to track the last version.
   private readonly _versions = new Map<string, number>();
   private readonly _elements = new Map<string, ExcalidrawElement>();

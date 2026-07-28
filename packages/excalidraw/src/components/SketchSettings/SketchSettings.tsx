@@ -5,35 +5,31 @@
 import React from 'react';
 
 import { type AppSurface } from '@dxos/app-toolkit/ui';
-import { Input, useTranslation } from '@dxos/react-ui';
-import { Settings as SettingsForm } from '@dxos/react-ui-form';
+import { Form } from '@dxos/react-ui-form';
 
 import { meta } from '#meta';
-import { type Settings } from '#types';
+import { Settings } from '#types';
 
-export type SketchSettingsProps = AppSurface.SettingsArticleProps<Settings.Settings>;
+export type SketchSettingsProps = AppSurface.SettingsProps<Settings.Settings>;
 
 export const SketchSettings = ({ settings, onSettingsChange }: SketchSettingsProps) => {
-  const { t } = useTranslation(meta.profile.key);
-
   return (
-    <SettingsForm.Viewport>
-      <SettingsForm.Section title={t('settings.title', { ns: meta.profile.key })}>
-        <SettingsForm.Item title={t('settings.hover-tools.label')} description={t('settings.hover-tools.description')}>
-          <Input.Switch
-            disabled={!onSettingsChange}
-            checked={settings.autoHideControls}
-            onCheckedChange={(checked) => onSettingsChange?.((s) => ({ ...s, autoHideControls: !!checked }))}
-          />
-        </SettingsForm.Item>
-        <SettingsForm.Item title={t('settings.grid-type.label')} description={t('settings.grid-type.description')}>
-          <Input.Switch
-            disabled={!onSettingsChange}
-            checked={settings.gridType === 'dotted'}
-            onCheckedChange={(checked) => onSettingsChange?.((s) => ({ ...s, gridType: checked ? 'dotted' : 'mesh' }))}
-          />
-        </SettingsForm.Item>
-      </SettingsForm.Section>
-    </SettingsForm.Viewport>
+    <Form.Root
+      variant='settings'
+      schema={Settings.Settings}
+      readonly={!onSettingsChange}
+      values={settings}
+      onValuesChanged={(values) => onSettingsChange?.((current) => ({ ...current, ...values }))}
+    >
+      <Form.Viewport scroll>
+        <Form.Content>
+          <Form.Section title={meta.profile.name}>
+            <Form.FieldSet />
+          </Form.Section>
+        </Form.Content>
+      </Form.Viewport>
+    </Form.Root>
   );
 };
+
+SketchSettings.displayName = 'SketchSettings';

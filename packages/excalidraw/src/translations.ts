@@ -24,11 +24,6 @@ export const translations = [
       },
       [meta.profile.key]: {
         'plugin.name': 'Sketch',
-        'settings.title': 'Sketch settings',
-        'settings.hover-tools.label': 'Auto hide controls',
-        'settings.hover-tools.description': 'Hide toolbar controls until you hover over them.',
-        'settings.grid-type.label': 'Dotted grid',
-        'settings.grid-type.description': 'Use a dotted grid instead of a mesh grid.',
       },
     },
   },

@@ -14,12 +14,11 @@ packages:
 # External (non-@dxos) dependencies. Plugins reference these as `catalog:` so a version lives in
 # exactly one place and every plugin resolves the same copy — duplicate React or Effect instances
 # break hooks and service registries at runtime.
-# Versions track the dxos monorepo's catalog. Deps the SDK itself resolves — `effect`,
-# `@automerge/automerge`, `react`, `react-dom` — must instead match the *pinned* SDK build in the
-# `dxos` catalog below, not dxos main: a version the SDK does not also resolve installs a second
-# copy, and Effect/Automerge brand their types nominally, so a duplicate fails the typecheck.
+# Versions track the dxos monorepo's catalog. Deps the SDK itself resolves — `effect`, `react` and
+# `react-dom` — must instead match the *pinned* SDK build in the `dxos` catalog below, not dxos
+# main: a version the SDK does not also resolve installs a second copy, and Effect brands its types
+# nominally, so a duplicate fails the typecheck rather than reporting a version conflict.
 catalog:
-  '@automerge/automerge': '3.3.0-fragments.1'
   '@changesets/changelog-git': '^0.2.1'
   '@changesets/cli': '^2.27.10'
   '@effect-atom/atom-react': '^0.5.0'
@@ -28,7 +27,7 @@ catalog:
   '@types/react': '~19.2.17'
   '@types/react-dom': '~19.2.3'
   '@vitejs/plugin-react': '^6.0.3'
-  effect: '3.21.3'
+  effect: '3.21.4'
   eslint-plugin-import-x: '^4.17.1'
   eslint-plugin-perfectionist: '^5.10.0'
   eslint-plugin-unused-imports: '^4.4.1'
@@ -45,25 +44,17 @@ catalog:
 
 catalogs:
   dxos:
-    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@59f470a'
-    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@59f470a'
-    '@dxos/async': 'https://pkg.pr.new/dxos/dxos/@dxos/async@59f470a'
-    '@dxos/client': 'https://pkg.pr.new/dxos/dxos/@dxos/client@59f470a'
-    '@dxos/client-protocol': 'https://pkg.pr.new/dxos/dxos/@dxos/client-protocol@59f470a'
-    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@59f470a'
-    '@dxos/context': 'https://pkg.pr.new/dxos/dxos/@dxos/context@59f470a'
-    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@59f470a'
-    '@dxos/echo-client': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-client@59f470a'
-    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@59f470a'
-    '@dxos/effect': 'https://pkg.pr.new/dxos/dxos/@dxos/effect@59f470a'
-    '@dxos/eslint-plugin-rules': 'https://pkg.pr.new/dxos/dxos/@dxos/eslint-plugin-rules@59f470a'
-    '@dxos/invariant': 'https://pkg.pr.new/dxos/dxos/@dxos/invariant@59f470a'
-    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@59f470a'
-    '@dxos/operation': 'https://pkg.pr.new/dxos/dxos/@dxos/operation@59f470a'
-    '@dxos/plugin-space': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-space@59f470a'
-    '@dxos/react-client': 'https://pkg.pr.new/dxos/dxos/@dxos/react-client@59f470a'
-    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@59f470a'
-    '@dxos/react-ui-form': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-form@59f470a'
-    '@dxos/react-ui-stack': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-stack@59f470a'
-    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@59f470a'
-    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@59f470a'
+    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@6be8009'
+    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@6be8009'
+    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@6be8009'
+    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@6be8009'
+    '@dxos/echo-client': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-client@6be8009'
+    '@dxos/echo-doc': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-doc@6be8009'
+    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@6be8009'
+    '@dxos/effect': 'https://pkg.pr.new/dxos/dxos/@dxos/effect@6be8009'
+    '@dxos/eslint-plugin-rules': 'https://pkg.pr.new/dxos/dxos/@dxos/eslint-plugin-rules@6be8009'
+    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@6be8009'
+    '@dxos/plugin-space': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-space@6be8009'
+    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@6be8009'
+    '@dxos/react-ui-form': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-form@6be8009'
+    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@6be8009'
