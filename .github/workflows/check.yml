@@ -9,7 +9,7 @@ on:
     branches: [main, release]
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +30,19 @@ jobs:
       # `:build` runs each plugin's typecheck + `vite build`, emitting dist/manifest.json
       # (incl. the resolved `dependencies` SDK-compat snapshot).
       - run: moon run :build
+
+  # Separate from `check` so a growing suite does not extend the static checks, and so a red test is
+  # distinguishable from a red build at a glance. The `test` moon task declares no build dependency —
+  # specs import from src — so this runs in parallel with `check`.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: moonrepo/setup-toolchain@v0
+        with:
+          auto-install: true
       - run: moon run :test
 
   # Advisory (NOT a gate): when a PR changes plugin source but has no `.changeset/*.md`, post/update
