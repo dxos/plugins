@@ -25,9 +25,13 @@ jobs:
       - name: Resolve latest dxos main commit
         id: sha
         run: echo "sha=$(git ls-remote https://github.com/dxos/dxos.git refs/heads/main | cut -c1-7)" >> "$GITHUB_OUTPUT"
-      - uses: moonrepo/setup-toolchain@v0
+      # The catalog is repinned before installing, so setup only provisions the toolchain here.
+      - uses: ./.github/actions/setup
+        with:
+          install: 'false'
       - name: Point the dxos catalog at the latest pkg.pr.new build
         run: node scripts/set-sdk.mjs pkg-pr-new ${{ steps.sha.outputs.sha }}
+      # Repinning the catalog invalidates the lockfile by design, so this cannot be frozen.
       - run: pnpm install --no-frozen-lockfile
       - run: moon run :build
       - name: Open/update the SDK upgrade PR
@@ -59,33 +63,20 @@ jobs:
         run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
 
       # A silent nightly failure is the hazard this workflow exists to prevent: tracking stops, and
-      # the pinned pkg.pr.new artifacts age toward expiry until `main` no longer installs. Gated on
-      # the secret so the step is a no-op until a webhook is configured.
+      # the pinned pkg.pr.new artifacts age toward expiry until `main` no longer installs. The action
+      # skips when no webhook is configured.
       - name: Notify on failure
         if: failure()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          SHA: ${{ steps.sha.outputs.sha }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
-            echo "DISCORD_WEBHOOK_URL is not set — skipping notification."
-            exit 0
-          fi
+        uses: ./.github/actions/notify
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          content: |
+            **SDK nightly failed** — `${{ github.repository }}`
 
-          read -r -d '' TEXT <<EOF || true
-          **SDK nightly failed** — \`${GITHUB_REPOSITORY}\`
+            Tracking `dxos/dxos@${{ steps.sha.outputs.sha }}`.
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-          Tracking \`dxos/dxos@${SHA:-unresolved}\`.
-          ${RUN_URL}
-
-          A failure here stops SDK tracking. pkg.pr.new artifacts expire (~1-6 months), so a pin left
-          unattended eventually stops installing. If \`pnpm install\` was the failing step, the external
-          catalog has most likely drifted from what the pinned SDK resolves — see "External deps the SDK
-          also resolves" in RELEASING.md.
-          EOF
-
-          # jq builds the JSON so newlines and any quotes in the message are escaped correctly.
-          jq -n --arg content "${TEXT}" '{content: $content}' \
-            | curl -sS -f -X POST -H 'Content-Type: application/json' -d @- "${DISCORD_WEBHOOK_URL}" \
-            && echo 'Notification sent.'
+            A failure here stops SDK tracking. pkg.pr.new artifacts expire (~1-6 months), so a pin
+            left unattended eventually stops installing. If `pnpm install` was the failing step, the
+            external catalog has most likely drifted from what the pinned SDK resolves — see
+            "External deps the SDK also resolves" in RELEASING.md.
