@@ -1,0 +1,36 @@
+# Composer community plugins — pnpm workspace.
+#
+# Every plugin under packages/* pins the DXOS SDK via the `dxos` named catalog below.
+# The SDK ships as a single unit, so one find-replace of the version/commit here bumps
+# every plugin in lockstep.
+#
+# `main` tracks the latest DXOS build via pkg.pr.new (the nightly "SDK upgrade" PR), but
+# releases require a published npm version — the release workflow refuses to publish a
+# plugin while the `dxos` catalog points at a pkg.pr.new / prerelease pin. See RELEASING.md.
+
+packages:
+  - 'packages/*'
+
+catalogs:
+  dxos:
+    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@59f470a'
+    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@59f470a'
+    '@dxos/async': 'https://pkg.pr.new/dxos/dxos/@dxos/async@59f470a'
+    '@dxos/client': 'https://pkg.pr.new/dxos/dxos/@dxos/client@59f470a'
+    '@dxos/client-protocol': 'https://pkg.pr.new/dxos/dxos/@dxos/client-protocol@59f470a'
+    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@59f470a'
+    '@dxos/context': 'https://pkg.pr.new/dxos/dxos/@dxos/context@59f470a'
+    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@59f470a'
+    '@dxos/echo-client': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-client@59f470a'
+    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@59f470a'
+    '@dxos/effect': 'https://pkg.pr.new/dxos/dxos/@dxos/effect@59f470a'
+    '@dxos/invariant': 'https://pkg.pr.new/dxos/dxos/@dxos/invariant@59f470a'
+    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@59f470a'
+    '@dxos/operation': 'https://pkg.pr.new/dxos/dxos/@dxos/operation@59f470a'
+    '@dxos/plugin-space': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-space@59f470a'
+    '@dxos/react-client': 'https://pkg.pr.new/dxos/dxos/@dxos/react-client@59f470a'
+    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@59f470a'
+    '@dxos/react-ui-form': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-form@59f470a'
+    '@dxos/react-ui-stack': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-stack@59f470a'
+    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@59f470a'
+    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@59f470a'

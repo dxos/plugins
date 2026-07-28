@@ -1,24 +1,72 @@
 name: Release
 
+# Changesets-driven release. `main` is the development branch (feature PRs + changesets land there);
+# a release is cut by promoting `main` → the `release` branch, which triggers this workflow. On push
+# to `release`:
+#  - if changesets are pending, opens/updates a "Version Packages" PR (bumps each changed plugin's
+#    version + CHANGELOG);
+#  - when that PR is merged (no changesets left), publishes the freshly-versioned plugins to the
+#    AT Protocol registry via `dx registry publish`.
+# Individual plugin features release on their own; an SDK bump (sdk-npm-release) bumps all → all
+# release together. The release guard forbids publishing against an unreleased (pkg.pr.new) SDK.
+
 on:
+  push:
+    branches: [release]
   workflow_dispatch:
-    inputs:
-      bump:
-        description: 'Version bump'
-        required: true
-        default: patch
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   release:
-    uses: dxos/community-plugins/.github/workflows/release-plugin.yml@main
-    with:
-      bump: ${{ inputs.bump }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Release guard — never publish against an unreleased SDK
+        # Matches quoted catalog entry values only, so the guard neither trips on the explanatory
+        # pkg.pr.new mentions in the file header nor goes blind once the catalog outgrows a fixed
+        # line window.
+        run: |
+          if grep -qE "^[[:space:]]+'[^']+':[[:space:]]*'[^']*pkg\.pr\.new" pnpm-workspace.yaml; then
+            echo "::error::Refusing to release: the dxos catalog points at a pkg.pr.new pin. Run the SDK npm release workflow first (see RELEASING.md)."
+            exit 1
+          fi
+          if grep -qE "^[[:space:]]+'[^']+':[[:space:]]*'[^']*[0-9]+\.[0-9]+\.[0-9]+-" pnpm-workspace.yaml; then
+            echo "::error::Refusing to release: the dxos catalog points at a prerelease version. Run the SDK npm release workflow first (see RELEASING.md)."
+            exit 1
+          fi
+
+      - uses: moonrepo/setup-toolchain@v0
+        with:
+          auto-install: true
+
+      # Opens a "Version Packages" PR while changesets are pending; once merged, `hasChangesets`
+      # is false and the publish step below runs against the bumped versions.
+      - id: changesets
+        uses: changesets/action@v1
+        with:
+          version: pnpm version-packages
+          publish: echo "noop — registry publish handled below"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish plugins to the registry
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        env:
+          # A verified publisher's credentials (or a CI publisher identity). The handle/app-password
+          # path writes directly to the PDS; `dx account login` is the alternative for the DPoP path.
+          ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
+          ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
+        run: |
+          npm install -g @dxos/cli
+          for dir in packages/*/; do
+            echo "::group::Publishing ${dir}"
+            # Re-publishing an unchanged version is rejected by the edge (immutable bundle); tolerate it.
+            dx registry publish --dir "${dir}" || echo "skipped ${dir} (already published or unchanged)"
+            echo "::endgroup::"
+          done

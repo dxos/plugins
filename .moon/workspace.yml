@@ -1,0 +1,10 @@
+# https://moonrepo.dev/docs/config/workspace
+$schema: https://moonrepo.dev/schemas/workspace.json
+
+# Each plugin under packages/* is a moon project (id = directory name, e.g. `excalidraw`).
+projects:
+  - 'packages/*'
+
+vcs:
+  client: git
+  defaultBranch: main

@@ -1,0 +1,10 @@
+# https://moonrepo.dev/docs/proto/config
+# Pinned to match the dxos monorepo so contributors share one toolchain.
+
+proto = "0.58.2"
+node = "24.11.1"
+pnpm = "10.28.0"
+moon = "2.4.5"
+
+[settings]
+auto-install = true

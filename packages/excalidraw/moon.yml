@@ -1,0 +1,6 @@
+# https://moonrepo.dev/docs/config/project
+# Tasks (build / typecheck / dev / preview) are inherited from /.moon/tasks.yml.
+$schema: https://moonrepo.dev/schemas/project.json
+
+layer: library
+language: typescript
