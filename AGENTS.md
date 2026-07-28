@@ -17,6 +17,8 @@ ask an a-or-b question, number the options.
   `vite` → `dev`, `preview` · `storybook` → `storybook`. Add a task by editing the tag file, so
   every plugin carrying that tag gets it — do not add `tasks:` to a plugin's `moon.yml`.
 - Toolchain (node/pnpm/moon) is pinned in `.prototools` — run `proto install` once.
+- **Format and lint before every commit**: `pnpm format` (oxfmt) and `pnpm lint` (oxlint `--fix`).
+  CI runs `oxfmt --check` and `moon run :lint`, and a single unformatted file fails the job.
 
 ## Dependencies
 
@@ -27,6 +29,12 @@ ask an a-or-b question, number the options.
   and moves in lockstep.
 - Add a shared external dep with `pnpm add --filter <plugin> --save-catalog <package>`, which writes
   the version to the default catalog and `catalog:` to the plugin.
+- **A dep the SDK also resolves must match the pinned SDK build, not dxos main.** `effect`,
+  `@automerge/automerge`, `react` and `react-dom` are declared by `@dxos/*` too; pick a version the
+  pinned build does not also resolve and pnpm installs a second copy. Effect and Automerge brand
+  their types nominally, so the duplicate surfaces as `Property '[TypeId]' is missing` across every
+  schema. Check with
+  `node -p "require('./node_modules/@dxos/echo/package.json').peerDependencies"`.
 - When editing `pnpm-workspace.yaml`, preserve the comments.
 
 ## Skills
@@ -90,7 +98,7 @@ on the interactive `pnpm changeset`). Create `.changeset/<short-kebab-summary>.m
 
 ```markdown
 ---
-"dxos-plugin-excalidraw": patch
+'dxos-plugin-excalidraw': patch
 ---
 
 One-line, user-facing summary of the change.

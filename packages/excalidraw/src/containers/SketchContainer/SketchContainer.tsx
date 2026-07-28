@@ -2,13 +2,14 @@
 // Copyright 2024 DXOS.org
 //
 
-import { Excalidraw, MainMenu } from '@excalidraw/excalidraw';
-import { type ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
-import { type ExcalidrawImperativeAPI, type ExcalidrawProps } from '@excalidraw/excalidraw/types';
 // Excalidraw ships its stylesheet as a sibling asset. `vite-plugin-css-injected-by-js`
 // picks this up and inlines it into `plugin.mjs` so the single distributed artifact
 // carries everything the runtime needs.
 import '@excalidraw/excalidraw/index.css';
+
+import { Excalidraw, MainMenu } from '@excalidraw/excalidraw';
+import { type ExcalidrawElement } from '@excalidraw/excalidraw/element/types';
+import { type ExcalidrawImperativeAPI, type ExcalidrawProps } from '@excalidraw/excalidraw/types';
 import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
 
 import { type AppSurface } from '@dxos/app-toolkit/ui';

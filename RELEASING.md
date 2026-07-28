@@ -28,7 +28,7 @@ this is the deterministic path for coding agents and scripts (no interactive pro
 
    ```markdown
    ---
-   "dxos-plugin-excalidraw": minor
+   'dxos-plugin-excalidraw': minor
    ---
 
    Add a freehand arrow tool.
@@ -38,11 +38,11 @@ this is the deterministic path for coding agents and scripts (no interactive pro
    the directory. Add one `"name": bump` line per plugin the change touches.
 3. Choose the bump:
 
-   | Bump | Use for |
-   | --- | --- |
+   | Bump    | Use for                                                                                  |
+   | ------- | ---------------------------------------------------------------------------------------- |
    | `patch` | bug fix, refactor, or dependency bump — no change to the plugin's public API or behavior |
-   | `minor` | a new backward-compatible feature/capability |
-   | `major` | a backward-incompatible change to behavior or stored data |
+   | `minor` | a new backward-compatible feature/capability                                             |
+   | `major` | a backward-incompatible change to behavior or stored data                                |
 
 4. The body is a one-line, user-facing summary — it lands verbatim in the plugin's `CHANGELOG.md`.
 
@@ -89,12 +89,12 @@ Composer catches up.
 
 ## CI
 
-| Workflow | Trigger | Does |
-| --- | --- | --- |
-| `ci.yml` | PR / push | `moon run :build` (typecheck + bundle + manifest) |
-| `sdk-nightly.yml` | nightly / dispatch | open/update the SDK upgrade PR from latest pkg.pr.new |
-| `sdk-npm-release.yml` | dispatch (version) | pin catalog to npm + release-together changeset → PR |
-| `release.yml` | push to `release` | Changesets version PR → `dx registry publish` per plugin (guarded) |
+| Workflow              | Trigger            | Does                                                               |
+| --------------------- | ------------------ | ------------------------------------------------------------------ |
+| `ci.yml`              | PR / push          | `moon run :build` (typecheck + bundle + manifest)                  |
+| `sdk-nightly.yml`     | nightly / dispatch | open/update the SDK upgrade PR from latest pkg.pr.new              |
+| `sdk-npm-release.yml` | dispatch (version) | pin catalog to npm + release-together changeset → PR               |
+| `release.yml`         | push to `release`  | Changesets version PR → `dx registry publish` per plugin (guarded) |
 
 ## Secrets / prerequisites
 

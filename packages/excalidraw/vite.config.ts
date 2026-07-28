@@ -17,9 +17,5 @@ export default defineConfig({
   resolve: {
     conditions: ['source', 'module', 'browser', 'development', 'production', 'import'],
   },
-  plugins: [
-    ...composerPlugin({ entry: 'src/ExcalidrawPlugin.tsx' }),
-    react(),
-    wasm(),
-  ],
+  plugins: [...composerPlugin({ entry: 'src/ExcalidrawPlugin.tsx' }), react(), wasm()],
 });

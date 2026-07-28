@@ -7,10 +7,22 @@
     "build": "moon run :build",
     "preview": "moon run :preview",
     "changeset": "changeset",
-    "version-packages": "changeset version"
+    "version-packages": "changeset version",
+    "format": "oxfmt",
+    "format-check": "oxfmt --check",
+    "lint": "pnpm exec moon run :lint-fix",
+    "lint-check": "pnpm exec moon run :lint",
+    "lint-fix": "pnpm exec moon run :lint-fix"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",
+    "@dxos/eslint-plugin-rules": "catalog:dxos",
+    "eslint-plugin-import-x": "catalog:",
+    "eslint-plugin-perfectionist": "catalog:",
+    "eslint-plugin-unused-imports": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
     "typescript": "catalog:"
   },
   "packageManager": "pnpm@10.28.0"

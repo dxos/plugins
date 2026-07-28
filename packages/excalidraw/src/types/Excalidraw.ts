@@ -28,10 +28,7 @@ export const Canvas = Schema.Struct({
   /** Versioning tag so the adapter can detect payloads it doesn't understand. */
   schema: Schema.String.pipe(Schema.optional),
   content: Schema.Record({ key: Schema.String, value: Schema.Any }),
-}).pipe(
-  HiddenAnnotation.set(true),
-  Type.makeObject(DXN.make('org.dxos.type.excalidraw.canvas', '0.1.0')),
-);
+}).pipe(HiddenAnnotation.set(true), Type.makeObject(DXN.make('org.dxos.type.excalidraw.canvas', '0.1.0')));
 export type Canvas = Type.InstanceType<typeof Canvas>;
 
 /** The user-facing Excalidraw object — a named handle around a canvas. */
