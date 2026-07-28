@@ -28,15 +28,15 @@ jobs:
           fetch-depth: 0
 
       - name: Release guard — never publish against an unreleased SDK
-        # Matches quoted catalog entry values only, so the guard neither trips on the explanatory
-        # pkg.pr.new mentions in the file header nor goes blind once the catalog outgrows a fixed
-        # line window.
+        # Matches quoted @dxos/* entry values only, so the guard neither trips on the explanatory
+        # pkg.pr.new mentions in the file header nor on a prerelease pin in the external catalog,
+        # and does not go blind once the catalog outgrows a fixed line window.
         run: |
-          if grep -qE "^[[:space:]]+'[^']+':[[:space:]]*'[^']*pkg\.pr\.new" pnpm-workspace.yaml; then
+          if grep -qE "^[[:space:]]+'@dxos/[^']+':[[:space:]]*'[^']*pkg\.pr\.new" pnpm-workspace.yaml; then
             echo "::error::Refusing to release: the dxos catalog points at a pkg.pr.new pin. Run the SDK npm release workflow first (see RELEASING.md)."
             exit 1
           fi
-          if grep -qE "^[[:space:]]+'[^']+':[[:space:]]*'[^']*[0-9]+\.[0-9]+\.[0-9]+-" pnpm-workspace.yaml; then
+          if grep -qE "^[[:space:]]+'@dxos/[^']+':[[:space:]]*'[^']*[0-9]+\.[0-9]+\.[0-9]+-" pnpm-workspace.yaml; then
             echo "::error::Refusing to release: the dxos catalog points at a prerelease version. Run the SDK npm release workflow first (see RELEASING.md)."
             exit 1
           fi

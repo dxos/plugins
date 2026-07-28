@@ -1,29 +1,50 @@
 # Agent guide — composer-plugins
 
 A pnpm + moon monorepo of community plugins for DXOS Composer. Each plugin is `packages/<name>/`
-(its own `package.json`, `dx.yml`, `vite.config.ts`, `src/`). All plugins share one DXOS SDK version
-via the `dxos` catalog in `pnpm-workspace.yaml`.
+(its own `package.json`, `dx.config.ts`, `vite.config.ts`, `src/`). All plugins share one DXOS SDK
+version via the `dxos` catalog in `pnpm-workspace.yaml`.
 
 **Always test your work after each step.** If unsure how to implement something, ask — and when you
 ask an a-or-b question, number the options.
 
 ## Build / dev
 
-- `pnpm install`, then `moon run :build` (typecheck + `vite build` + manifest). `moon run <name>:dev`
-  to dev-serve one plugin (e.g. `moon run excalidraw:dev`); `moon run :build` builds all.
+- `pnpm install`, then `moon run :build` (typecheck + `vite build` + manifest). `moon run :build`
+  builds all.
+- Tasks are **tag-based**, never per-project: a plugin's `moon.yml` declares `tags`, and each tag
+  inherits the matching `/.moon/tasks/tag-<tag>.yml`. Available tags → tasks:
+  `typecheck` → `typecheck` · `ts-vite-build` → `build` · `ts-test` → `test`, `test-watch` ·
+  `vite` → `dev`, `preview` · `storybook` → `storybook`. Add a task by editing the tag file, so
+  every plugin carrying that tag gets it — do not add `tasks:` to a plugin's `moon.yml`.
 - Toolchain (node/pnpm/moon) is pinned in `.prototools` — run `proto install` once.
-- Run the linter at natural stopping points.
 
 ## Dependencies
 
-- External dependency versions are managed in the pnpm catalogs (`pnpm-workspace.yaml`).
-- `@dxos/*` resolve from the **`dxos`** named catalog (`catalog:dxos`). **Never hand-edit the `dxos`
-  catalog** — use `node scripts/set-sdk.mjs`. The SDK ships as one unit and moves in lockstep.
-- Add a shared external dep with `pnpm add --filter <plugin> --save-catalog <package>`; plugin-only
-  deps can be added directly to that plugin's `package.json`.
+- **Every dependency version lives in a catalog in `pnpm-workspace.yaml`; a `package.json` never
+  carries a literal version.** Two catalogs: the default `catalog:` for external packages, and the
+  named `catalog:dxos` for `@dxos/*`.
+- **Never hand-edit the `dxos` catalog** — use `node scripts/set-sdk.mjs`. The SDK ships as one unit
+  and moves in lockstep.
+- Add a shared external dep with `pnpm add --filter <plugin> --save-catalog <package>`, which writes
+  the version to the default catalog and `catalog:` to the plugin.
 - When editing `pnpm-workspace.yaml`, preserve the comments.
 
+## Skills
+
+Deep, task-specific guidance lives in `.agents/skills/*` — follow the relevant one:
+
+- `code-style` — namespace exports, internal-module imports, class-member ordering, options-bag
+  types, the no-cast rule, the comment rule, test structure.
+- `composer-plugins` — plugin structure, capabilities, containers vs components, operations.
+- `composer-ui` — theme tokens, `@dxos/react-ui*` primitives, forms, lists, toolbars, storybook.
+
+These are ported from the `dxos/dxos` monorepo. Where they cite a source path, `@dxos/<pkg>/src/...`
+refers to the published package — readable under `node_modules/@dxos/<pkg>/src/`, since the SDK
+tarballs ship their sources.
+
 ## Code style
+
+Summary below; the `code-style` skill is authoritative.
 
 - TypeScript, single quotes. Prefer functional programming and arrow functions.
 - Import order: builtin → external → `@dxos` → internal → parent → sibling (blank line between groups).
@@ -77,7 +98,9 @@ One-line, user-facing summary of the change.
 
 - Key = the plugin's `package.json` **`name`** (one line per plugin touched).
 - Bump: `patch` = fix/refactor/dep bump (no API/behavior change) · `minor` = new backward-compatible
-  feature · `major` = backward-incompatible change.
+  feature **or a breaking change** · `major` = reserved for a deliberate `1.0.0` cut.
+  Plugins are pre-1.0, so breaking rides the minor (`0.1.28 → 0.2.0`); writing `major` would ship
+  `1.0.0` by accident.
 - **Skip it** for non-plugin changes (repo tooling, CI, root docs, tests). Don't hand-write the
   coordinated SDK bump — that's `scripts/changeset-all.mjs`.
 

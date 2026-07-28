@@ -1,0 +1,27 @@
+# https://moonrepo.dev/docs/config/tasks
+# Inherited by every project. Task definitions live in the tag-*.yml files alongside this one;
+# a plugin opts into them via `tags` in its moon.yml.
+$schema: https://moonrepo.dev/schemas/tasks.json
+
+fileGroups:
+  assets:
+    - assets/**/*
+    - public/**/*
+
+  sources:
+    - src/**/*
+
+  production:
+    - src/**/*
+    - '!src/**/*.test.tsx?'
+    - '!src/**/*.stories.tsx'
+
+  tests:
+    - src/**/*.test.tsx?
+
+implicitInputs:
+  - package.json
+  - moon.yml
+  # The dxos catalog resolves every @dxos/* version, so a catalog edit invalidates every task.
+  - /pnpm-workspace.yaml
+  - /pnpm-lock.yaml

@@ -1,0 +1,13 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+tasks:
+  typecheck:
+    command: pnpm exec tsc --noEmit
+    inputs:
+      - /tsconfig.base.json
+      - tsconfig.json
+      - '@group(sources)'
+    options:
+      timeout: 60
+
+inheritedBy:
+  tags: typecheck
