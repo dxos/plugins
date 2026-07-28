@@ -113,7 +113,7 @@ Phase 1, before the PR. The skeleton should include:
 
 1. `README.md` — brief description of the plugin's purpose.
 2. `package.json` — with `"private": true`, `#plugin` import alias, `./plugin` export subpath, and minimal dependencies.
-3. `moon.yml` — with `compile` entry points for both `src/index.ts` and `src/plugin.ts`.
+3. `moon.yml` — `tags` only (`typecheck`, `ts-vite-build`, `ts-test`, `vite`, `storybook`); no `tasks`.
 4. `src/meta.ts` — plugin metadata (id, name, description, icon, iconHue).
 5. `src/translations.ts` — initial translation resources.
 6. `src/FooPlugin.tsx` — minimal `Plugin.define(meta).pipe()` with surface and translations modules, plus `export default FooPlugin`.
@@ -254,8 +254,8 @@ plugin-comments re-exports `AppCapabilities.CommentConfig` as `CommentCapabiliti
 export const BarProvider = Capability.make<BarProvider>(`${meta.id}.capability.bar-provider`);
 ```
 
-Expose it via a `./types` subpath in `package.json` (see `plugin-game/package.json` as a reference).
-The `--entryPoint=src/types/index.ts` entry in `moon.yml` is typically already present.
+Expose it via a `./types` subpath in `package.json`. `vite build` derives its entry points from
+`package.json`, so no `moon.yml` change is needed.
 
 **Where to implement** — the donor plugin places its contribution in a dedicated file in
 `src/capabilities/`, named after the capability it implements (e.g. `routing-service.ts`,
