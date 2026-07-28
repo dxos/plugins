@@ -74,6 +74,35 @@ The SDK ships as one unit; bump it via the `dxos` catalog (one place).
   adds a release-together changeset for every plugin (`scripts/changeset-all.mjs`), and opens a PR.
   Merging republishes all plugins against the new SDK.
 
+### pkg.pr.new pins are perishable
+
+A pkg.pr.new build is a CI artifact, not a registry release, and **they expire (roughly 1–6 months)**.
+Two consequences:
+
+- A committed pin has a shelf life. If nightly tracking stalls, `main` eventually stops installing —
+  and an old commit can no longer be rebuilt at all, because its pinned artifacts are gone.
+- Tracking is a bridge, not a destination. Re-pin to a published npm SDK via **SDK npm release** as
+  soon as one carries what the plugins need. The release guard enforces only the tail end of this,
+  by refusing to publish while the catalog holds a pkg.pr.new pin.
+
+Pin with a **7-character** SHA. pkg.pr.new serves any prefix length, but it emits 7-character SHAs in
+the `@dxos/*` cross-package dependency URLs and pnpm keys resolutions on the literal URL — a longer
+pin resolves to the same build while installing a second, duplicate copy of the entire SDK.
+
+### External deps the SDK also resolves
+
+`effect`, `@automerge/automerge`, `react` and `react-dom` are declared by `@dxos/*` as well as by the
+plugins. The default catalog must hold a version the **pinned** SDK build also resolves; anything else
+installs a second copy, and since Effect and Automerge brand their types nominally, the duplicate
+surfaces as `Property '[TypeId]' is missing` across every schema rather than as a version complaint.
+Check what the pin requires before changing one:
+
+```bash
+node -p "require('./node_modules/@dxos/echo/package.json').peerDependencies"
+```
+
+Moving the SDK pin can therefore require moving these in step.
+
 ### Migration window
 
 Publish the new plugin versions **ahead of** the stable Composer release, then hold before promoting

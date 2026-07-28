@@ -92,18 +92,14 @@
     "@dxos/react-ui-stack": "catalog:dxos",
     "@dxos/ui-theme": "catalog:dxos",
     "@dxos/util": "catalog:dxos",
-    "@effect-atom/atom": "catalog:",
     "@effect-atom/atom-react": "catalog:",
     "@excalidraw/excalidraw": "catalog:",
     "effect": "catalog:",
-    "lodash.defaultsdeep": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:",
-    "react-resize-detector": "catalog:"
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@storybook/react-vite": "catalog:",
-    "@types/lodash.defaultsdeep": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",

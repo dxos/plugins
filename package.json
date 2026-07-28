@@ -15,6 +15,7 @@
     "lint-fix": "pnpm exec moon run :lint-fix"
   },
   "devDependencies": {
+    "@changesets/changelog-git": "catalog:",
     "@changesets/cli": "catalog:",
     "@dxos/eslint-plugin-rules": "catalog:dxos",
     "eslint-plugin-import-x": "catalog:",
