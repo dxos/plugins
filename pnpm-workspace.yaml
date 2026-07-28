@@ -11,6 +11,16 @@
 packages:
   - 'packages/*'
 
+# `@dxos/keys` imports base32-decode/base32-encode in src/identity-did.ts without declaring them; the
+# dxos monorepo only resolves them because its root catalog hoists them. Plugins compile the SDK from
+# its `source` export condition, so the missing declaration has to be supplied here — the vite build
+# tree-shakes that module away, but vitest loads the full graph and fails without it.
+packageExtensions:
+  '@dxos/keys':
+    dependencies:
+      base32-decode: '^1.0.0'
+      base32-encode: '^2.0.0'
+
 # External (non-@dxos) dependencies. Plugins reference these as `catalog:` so a version lives in
 # exactly one place and every plugin resolves the same copy — duplicate React or Effect instances
 # break hooks and service registries at runtime.

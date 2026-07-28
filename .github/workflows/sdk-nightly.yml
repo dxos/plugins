@@ -31,6 +31,7 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - run: moon run :build
       - name: Open/update the SDK upgrade PR
+        id: pr
         uses: peter-evans/create-pull-request@v6
         with:
           branch: sdk-upgrade
@@ -43,3 +44,16 @@ jobs:
             **Not releasable:** the release workflow refuses to publish while the catalog is a
             pkg.pr.new pin. Merging keeps `main` building against the latest SDK; publish a real
             release via the **SDK npm release** workflow once DXOS cuts an npm version.
+
+            Auto-merge is enabled — this lands on its own once CI is green.
+
+      # The diff is 21 identical URL substitutions plus a lockfile, which is exactly the review a
+      # human rubber-stamps. `main` never publishes and the release guard blocks releasing from a
+      # pkg.pr.new pin, so the worst case is a rolling pin that the next nightly replaces.
+      # Requires `allow_auto_merge` on the repository and a required status check on `main`;
+      # without a required check GitHub merges immediately rather than waiting for CI.
+      - name: Enable auto-merge
+        if: steps.pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
