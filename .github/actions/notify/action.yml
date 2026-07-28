@@ -1,8 +1,8 @@
 name: Notify
 description: Post a message to a Discord webhook, skipping when no webhook is configured.
 
-# TODO(wittjosiah): Move to a shared public repo of reusable workflows/actions once a second repo
-#   needs it, so the notification is maintained in one place across repositories rather than copied.
+# TODO(wittjosiah): Consider factoring out into a shared public repo of reusable workflows/actions,
+#   alongside the other CI pieces already copied between this repo and dxos/dxos.
 
 inputs:
   webhook-url:

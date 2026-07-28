@@ -1,8 +1,9 @@
 name: Setup
 description: Install the pinned toolchain and, optionally, the workspace dependencies.
 
-# TODO(wittjosiah): Move to a shared public repo of reusable workflows/actions once a second repo
-#   needs it, so the setup is maintained in one place across repositories rather than copied.
+# TODO(wittjosiah): Consider factoring out into a shared public repo of reusable workflows/actions.
+#   dxos/dxos already has its own `.github/actions/setup` doing the same job; this is a copy, and the
+#   two drift independently.
 
 inputs:
   install:
