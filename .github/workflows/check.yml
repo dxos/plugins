@@ -9,7 +9,7 @@ on:
     branches: [main, release]
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,19 +17,24 @@ jobs:
           # moon resolves a merge base against the PR's base ref to compute touched files, which a
           # shallow clone cannot do — the base branch is not in the object store.
           fetch-depth: 0
-      # Installs proto + the toolchain pinned in .prototools (node, pnpm, moon) and runs pnpm install.
-      - uses: moonrepo/setup-toolchain@v0
-        with:
-          auto-install: true
-      # moon installs node_modules itself when a task runs, so a step invoking a binary directly
-      # needs deps present first. --frozen-lockfile also fails the job on lockfile drift.
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup
       # Formatting first: it is the cheapest check and a single unformatted file fails the job.
       - run: pnpm run format-check
       - run: moon run :lint
       # `:build` runs each plugin's typecheck + `vite build`, emitting dist/manifest.json
       # (incl. the resolved `dependencies` SDK-compat snapshot).
       - run: moon run :build
+
+  # Separate from `check` so a growing suite does not extend the static checks, and so a red test is
+  # distinguishable from a red build at a glance. The `test` moon task declares no build dependency —
+  # specs import from src — so this runs in parallel with `check`.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
       - run: moon run :test
 
   # Advisory (NOT a gate): when a PR changes plugin source but has no `.changeset/*.md`, post/update

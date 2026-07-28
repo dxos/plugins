@@ -1,0 +1,38 @@
+name: Setup
+description: Install the pinned toolchain and, optionally, the workspace dependencies.
+
+# TODO(wittjosiah): Consider factoring out into a shared public repo of reusable workflows/actions.
+#   dxos/dxos already has its own `.github/actions/setup` doing the same job; this is a copy, and the
+#   two drift independently.
+
+inputs:
+  install:
+    description: >
+      Whether to install workspace dependencies. Set to "false" when the caller mutates the
+      lockfile or catalogs after setup and installs itself (e.g. the SDK nightly).
+    default: 'true'
+  frozen-lockfile:
+    description: >
+      Whether to install with --frozen-lockfile, which additionally fails on lockfile drift.
+      Set to "false" for workflows that intentionally repin dependencies.
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    # Installs proto + the toolchain pinned in .prototools (node, pnpm, moon).
+    - uses: moonrepo/setup-toolchain@v0
+      with:
+        auto-install: true
+
+    # moon installs node_modules itself when a task runs, so a step invoking a binary directly
+    # (oxfmt, oxlint) needs deps present first.
+    - name: Install dependencies
+      if: inputs.install == 'true'
+      run: |
+        if [ "${{ inputs.frozen-lockfile }}" = "true" ]; then
+          pnpm install --frozen-lockfile
+        else
+          pnpm install --no-frozen-lockfile
+        fi
+      shell: bash

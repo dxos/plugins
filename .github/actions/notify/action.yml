@@ -1,0 +1,34 @@
+name: Notify
+description: Post a message to a Discord webhook, skipping when no webhook is configured.
+
+# TODO(wittjosiah): Consider factoring out into a shared public repo of reusable workflows/actions,
+#   alongside the other CI pieces already copied between this repo and dxos/dxos.
+
+inputs:
+  webhook-url:
+    description: >
+      Discord webhook URL. When empty the action logs and succeeds, so callers can wire up
+      notification before a webhook exists.
+    required: true
+  content:
+    description: Message body. Discord renders markdown.
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Post to Discord
+      env:
+        WEBHOOK_URL: ${{ inputs.webhook-url }}
+        CONTENT: ${{ inputs.content }}
+      run: |
+        if [ -z "${WEBHOOK_URL}" ]; then
+          echo 'No webhook configured — skipping notification.'
+          exit 0
+        fi
+
+        # jq builds the JSON so newlines and any quotes in the message are escaped correctly.
+        jq -n --arg content "${CONTENT}" '{content: $content}' \
+          | curl -sS -f -X POST -H 'Content-Type: application/json' -d @- "${WEBHOOK_URL}" \
+          && echo 'Notification sent.'
+      shell: bash
