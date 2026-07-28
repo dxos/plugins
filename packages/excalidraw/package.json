@@ -82,6 +82,7 @@
     "@dxos/plugin-space": "catalog:dxos",
     "@dxos/react-ui": "catalog:dxos",
     "@dxos/react-ui-form": "catalog:dxos",
+    "@dxos/schema": "catalog:dxos",
     "@dxos/util": "catalog:dxos",
     "@effect-atom/atom-react": "catalog:",
     "@excalidraw/excalidraw": "catalog:",

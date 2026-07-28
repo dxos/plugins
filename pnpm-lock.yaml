@@ -112,6 +112,9 @@ catalogs:
     '@dxos/react-ui-form':
       specifier: https://pkg.pr.new/dxos/dxos/@dxos/react-ui-form@6be8009
       version: 0.10.0
+    '@dxos/schema':
+      specifier: https://pkg.pr.new/dxos/dxos/@dxos/schema@6be8009
+      version: 0.10.0
     '@dxos/util':
       specifier: https://pkg.pr.new/dxos/dxos/@dxos/util@6be8009
       version: 0.10.0
@@ -189,6 +192,9 @@ importers:
       '@dxos/react-ui-form':
         specifier: catalog:dxos
         version: https://pkg.pr.new/dxos/dxos/@dxos/react-ui-form@6be8009(341813c56cc1f39bcd5546b1b90fe5ad)
+      '@dxos/schema':
+        specifier: catalog:dxos
+        version: https://pkg.pr.new/dxos/dxos/@dxos/schema@6be8009(@effect/experimental@0.60.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform-browser@0.76.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform@0.96.2(effect@3.21.4))(@effect/rpc@0.75.1(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@opentelemetry/resources@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.221.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-metrics@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-node@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-web@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.43.0)(effect@3.21.4)(react@19.2.8)(scheduler@0.27.0)
       '@dxos/util':
         specifier: catalog:dxos
         version: https://pkg.pr.new/dxos/dxos/@dxos/util@6be8009(effect@3.21.4)
@@ -1374,6 +1380,12 @@ packages:
   '@dxos/rpc@https://pkg.pr.new/dxos/dxos/@dxos/rpc@6be80092bf9f2331de09d3cd1ee75f625ec5cfca':
     resolution: {tarball: https://pkg.pr.new/dxos/dxos/@dxos/rpc@6be80092bf9f2331de09d3cd1ee75f625ec5cfca}
     version: 0.10.0
+
+  '@dxos/schema@https://pkg.pr.new/dxos/dxos/@dxos/schema@6be8009':
+    resolution: {tarball: https://pkg.pr.new/dxos/dxos/@dxos/schema@6be8009}
+    version: 0.10.0
+    peerDependencies:
+      effect: 3.21.4
 
   '@dxos/schema@https://pkg.pr.new/dxos/dxos/@dxos/schema@6be80092bf9f2331de09d3cd1ee75f625ec5cfca':
     resolution: {tarball: https://pkg.pr.new/dxos/dxos/@dxos/schema@6be80092bf9f2331de09d3cd1ee75f625ec5cfca}
@@ -12905,6 +12917,43 @@ snapshots:
       - '@opentelemetry/semantic-conventions'
       - react
       - scheduler
+
+  '@dxos/schema@https://pkg.pr.new/dxos/dxos/@dxos/schema@6be8009(@effect/experimental@0.60.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform-browser@0.76.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform@0.96.2(effect@3.21.4))(@effect/rpc@0.75.1(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@opentelemetry/resources@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.221.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-metrics@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-node@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-web@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.43.0)(effect@3.21.4)(react@19.2.8)(scheduler@0.27.0)':
+    dependencies:
+      '@dxos/async': https://pkg.pr.new/dxos/dxos/@dxos/async@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(effect@3.21.4)
+      '@dxos/client-protocol': https://pkg.pr.new/dxos/dxos/@dxos/client-protocol@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(@effect/experimental@0.60.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@opentelemetry/resources@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.221.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-metrics@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-node@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-web@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.43.0)(effect@3.21.4)(react@19.2.8)(scheduler@0.27.0)
+      '@dxos/echo': https://pkg.pr.new/dxos/dxos/@dxos/echo@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(@effect/experimental@0.60.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform-browser@0.76.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform@0.96.2(effect@3.21.4))(@effect/rpc@0.75.1(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@opentelemetry/resources@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.221.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-metrics@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-node@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-web@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.43.0)(react@19.2.8)(scheduler@0.27.0)
+      '@dxos/echo-client': https://pkg.pr.new/dxos/dxos/@dxos/echo-client@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(@effect/platform-browser@0.76.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform@0.96.2(effect@3.21.4))(@effect/rpc@0.75.1(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@opentelemetry/resources@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.221.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-metrics@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-node@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-web@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.43.0)(react@19.2.8)(scheduler@0.27.0)
+      '@dxos/effect': https://pkg.pr.new/dxos/dxos/@dxos/effect@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(@effect/experimental@0.60.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform-browser@0.76.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform@0.96.2(effect@3.21.4))(@effect/rpc@0.75.1(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@opentelemetry/resources@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.221.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-metrics@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-node@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-web@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.43.0)(effect@3.21.4)(react@19.2.8)(scheduler@0.27.0)
+      '@dxos/graph': https://pkg.pr.new/dxos/dxos/@dxos/graph@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(@effect/experimental@0.60.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform@0.96.2(effect@3.21.4))(@effect/rpc@0.75.1(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(effect@3.21.4)(react@19.2.8)(scheduler@0.27.0)
+      '@dxos/invariant': https://pkg.pr.new/dxos/dxos/@dxos/invariant@6be80092bf9f2331de09d3cd1ee75f625ec5cfca
+      '@dxos/keys': https://pkg.pr.new/dxos/dxos/@dxos/keys@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(effect@3.21.4)
+      '@dxos/log': https://pkg.pr.new/dxos/dxos/@dxos/log@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(effect@3.21.4)
+      '@dxos/random': https://pkg.pr.new/dxos/dxos/@dxos/random@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(effect@3.21.4)
+      '@dxos/util': https://pkg.pr.new/dxos/dxos/@dxos/util@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(effect@3.21.4)
+      '@effect-atom/atom-react': 0.5.0(@effect/experimental@0.60.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform@0.96.2(effect@3.21.4))(@effect/rpc@0.75.1(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(effect@3.21.4)(react@19.2.8)(scheduler@0.27.0)
+      effect: 3.21.4
+    transitivePeerDependencies:
+      - '@effect/experimental'
+      - '@effect/platform'
+      - '@effect/platform-browser'
+      - '@effect/rpc'
+      - '@opentelemetry/resources'
+      - '@opentelemetry/sdk-logs'
+      - '@opentelemetry/sdk-metrics'
+      - '@opentelemetry/sdk-trace-base'
+      - '@opentelemetry/sdk-trace-node'
+      - '@opentelemetry/sdk-trace-web'
+      - '@opentelemetry/semantic-conventions'
+      - bare-abort-controller
+      - bufferutil
+      - ioredis
+      - lmdb
+      - react
+      - react-native-b4a
+      - scheduler
+      - supports-color
+      - utf-8-validate
 
   '@dxos/schema@https://pkg.pr.new/dxos/dxos/@dxos/schema@6be80092bf9f2331de09d3cd1ee75f625ec5cfca(@effect/experimental@0.60.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform-browser@0.76.0(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@effect/platform@0.96.2(effect@3.21.4))(@effect/rpc@0.75.1(@effect/platform@0.96.2(effect@3.21.4))(effect@3.21.4))(@opentelemetry/resources@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-logs@0.221.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-metrics@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-node@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-web@2.10.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.43.0)(effect@3.21.4)(react@19.2.8)(scheduler@0.27.0)':
     dependencies:
