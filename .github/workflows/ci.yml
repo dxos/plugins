@@ -2,6 +2,9 @@ name: CI
 
 on:
   pull_request:
+  # The `main` ruleset merges through a merge queue, which validates on a temporary merge-group ref;
+  # without this trigger no checks run there and the queue waits out its check-response timeout.
+  merge_group:
   push:
     branches: [main, release]
 
