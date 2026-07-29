@@ -9,18 +9,18 @@ ask an a-or-b question, number the options.
 
 ## Build / dev
 
-- `pnpm install`, then `moon run :build` (typecheck + `vite build` + manifest). `moon run :build`
-  builds all.
-- **Two build outputs, two audiences.** `:build` bundles the plugin for the registry into `out/`,
-  with every dependency inlined so Composer loads one self-contained artifact. `:build-lib` emits the
-  npm library into `dist/` (`dist/lib` JS with dependencies externalised, `dist/types` declarations
-  from `tsc`). Only `dist` and `src` ship to npm — `out/` must never reach the tarball, or consumers
+- `pnpm install`, then `moon run :build` (the npm library) and/or `moon run :bundle` (the registry
+  bundle). Task names mirror dxos/dxos: `build` = library, `bundle` = vite bundle.
+- **Two build outputs, two audiences.** `:build` emits the npm library into `dist/` (`dist/lib` JS
+  with dependencies externalised, `dist/types` declarations from `tsc`). `:bundle` bundles the plugin
+  for the registry into `out/`, with every dependency inlined so Composer loads one self-contained
+  artifact. Only `dist` and `src` ship to npm — `out/` must never reach the tarball, or consumers
   get a second copy of React, Effect and the SDK.
 - Tasks are **tag-based**, never per-project: a plugin's `moon.yml` declares `tags`, and each tag
   inherits the matching `/.moon/tasks/tag-<tag>.yml`. Available tags → tasks:
   `typecheck` → `typecheck` · `ts-vite-build` → `build` · `ts-test` → `test`, `test-watch` ·
-  `vite` → `dev`, `preview` · `storybook` → `storybook`. Add a task by editing the tag file, so
-  every plugin carrying that tag gets it — do not add `tasks:` to a plugin's `moon.yml`.
+  `vite` → `bundle`, `dev`, `preview` · `storybook` → `storybook`. Add a task by editing the tag
+  file, so every plugin carrying that tag gets it — do not add `tasks:` to a plugin's `moon.yml`.
 - Toolchain (node/pnpm/moon) is pinned in `.prototools` — run `proto install` once.
 - **Format and lint before every commit**: `pnpm format` (oxfmt) and `pnpm lint` (oxlint `--fix`).
   CI runs `oxfmt --check` and `moon run :lint`, and a single unformatted file fails the job.
@@ -128,7 +128,7 @@ whatever accumulated. See [RELEASING.md](./RELEASING.md) for the full flow and t
 
 - New packages must be `"private": true` until they are ready to publish (plugins reach Composer via
   `dx registry publish`; npm is the secondary channel). A publishable plugin needs the `ts-vite-build`
-  tag for both `:build` and `:build-lib`, and its `exports`/`imports` maps must point at what
-  `:build-lib` emits.
+  tag (`:build`, the npm library) and the `vite` tag (`:bundle`, the registry artifact), and its
+  `exports`/`imports` maps must point at what `:build` emits.
 - PR titles use Conventional Commits: `feat(excalidraw): …`, `fix: …`, `refactor: …`, `docs: …`.
 - Before committing, run `git status` and account for every modified/untracked file.

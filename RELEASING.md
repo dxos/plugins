@@ -129,7 +129,7 @@ Composer catches up.
 
 | Workflow              | Trigger            | Does                                                                              |
 | --------------------- | ------------------ | --------------------------------------------------------------------------------- |
-| `check.yml`           | PR / push / queue  | format, lint, build (typecheck + bundle + manifest), test                         |
+| `check.yml`           | PR / push / queue  | format, lint, build (npm library), bundle (registry artifact + manifest), test    |
 | `sdk-nightly.yml`     | nightly / dispatch | open/update the SDK upgrade PR from latest pkg.pr.new                             |
 | `sdk-npm-release.yml` | dispatch (version) | pin catalog to npm + release-together changeset → PR                              |
 | `release.yml`         | push to `main`     | Changesets version PR → tag + `dx registry publish` per released plugin (guarded) |

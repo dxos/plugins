@@ -479,7 +479,8 @@ See: `packages/excalidraw/moon.yml`
 
 ```bash
 moon run <plugin>:typecheck
-moon run <plugin>:build
+moon run <plugin>:build     # npm library → dist/
+moon run <plugin>:bundle    # registry artifact → out/
 moon run <plugin>:test
 moon run <plugin>:storybook
 ```

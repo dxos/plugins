@@ -26,7 +26,9 @@ jobs:
       - name: Pin the dxos catalog to the npm release
         run: node scripts/set-sdk.mjs npm '${{ inputs.version }}'
       - run: pnpm install --no-frozen-lockfile
-      - run: moon run :build
+      # Smoke both artifacts against the repinned SDK — the library and the composerPlugin bundle
+      # break in different ways.
+      - run: moon run :build :bundle
       - name: Add a release-together changeset for every plugin
         run: node scripts/changeset-all.mjs "Rebuild against DXOS SDK ${{ inputs.version }}."
       - name: Open the SDK release PR

@@ -43,8 +43,10 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      # `files` ships dist/, so the library has to exist before changesets packs the tarball.
-      - run: moon run :build-lib
+      # `files` ships dist/, so the library has to exist before changesets packs the tarball. The
+      # registry bundle is not built here — `dx registry publish` runs the `buildCommand` declared
+      # in each plugin's dx.config.ts itself.
+      - run: moon run :build
 
       # `changeset publish` pushes to npm and tags each released version; `publishedPackages` then
       # reports exactly what this run released, which drives the registry publish below.
