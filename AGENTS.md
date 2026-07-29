@@ -103,7 +103,7 @@ on the interactive `pnpm changeset`). Create `.changeset/<short-kebab-summary>.m
 
 ```markdown
 ---
-'@dxos/plugin-excalidraw': patch
+'@dxos/plugin-tictactoe': patch
 ---
 
 One-line, user-facing summary of the change.
@@ -130,5 +130,5 @@ whatever accumulated. See [RELEASING.md](./RELEASING.md) for the full flow and t
   `dx registry publish`; npm is the secondary channel). A publishable plugin needs the `ts-vite-build`
   tag (`:build`, the npm library) and the `vite` tag (`:bundle`, the registry artifact), and its
   `exports`/`imports` maps must point at what `:build` emits.
-- PR titles use Conventional Commits: `feat(excalidraw): …`, `fix: …`, `refactor: …`, `docs: …`.
+- PR titles use Conventional Commits: `feat(tictactoe): …`, `fix: …`, `refactor: …`, `docs: …`.
 - Before committing, run `git status` and account for every modified/untracked file.

@@ -9,7 +9,7 @@ description: Use when working on files in packages/, adding new plugins,
 
 # Composer Plugins
 
-Exemplar: `packages/excalidraw`. The richer reference implementations (`plugin-chess` et al.) live in
+Exemplar: `packages/tictactoe`. The richer reference implementations (`plugin-chess` et al.) live in
 the `dxos/dxos` monorepo under `packages/plugins/` — consult them there for patterns this repo has no
 example of.
 
@@ -455,7 +455,7 @@ See: `plugin-chess/src/translations.ts`
 - `@dxos` deps use `catalog:dxos`; every external dep uses `catalog:`. No literal version strings in a
   plugin's `package.json` — the catalogs in `pnpm-workspace.yaml` are the single source of truth.
 
-See: `packages/excalidraw/package.json`
+See: `packages/tictactoe/package.json`
 
 ## moon.yml
 
@@ -463,7 +463,7 @@ A plugin's `moon.yml` declares no tasks of its own — it lists `tags`, and each
 `/.moon/tasks/tag-<tag>.yml`: `typecheck`, `ts-vite-build` (build), `ts-test` (test/test-watch), `vite`
 (dev/preview), `storybook`.
 
-See: `packages/excalidraw/moon.yml`
+See: `packages/tictactoe/moon.yml`
 
 ## Coding Style
 

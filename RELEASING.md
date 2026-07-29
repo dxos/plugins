@@ -29,13 +29,13 @@ this is the deterministic path for coding agents and scripts (no interactive pro
 
    ```markdown
    ---
-   '@dxos/plugin-excalidraw': minor
+   '@dxos/plugin-tictactoe': minor
    ---
 
-   Add a freehand arrow tool.
+   Add AI difficulty levels.
    ```
 
-2. The frontmatter key is the plugin's **`package.json` `name`** (e.g. `@dxos/plugin-excalidraw`), not
+2. The frontmatter key is the plugin's **`package.json` `name`** (e.g. `@dxos/plugin-tictactoe`), not
    the directory. Add one `"name": bump` line per plugin the change touches.
 3. Choose the bump:
 
