@@ -98,7 +98,7 @@ on the interactive `pnpm changeset`). Create `.changeset/<short-kebab-summary>.m
 
 ```markdown
 ---
-'dxos-plugin-excalidraw': patch
+'@dxos/plugin-excalidraw': patch
 ---
 
 One-line, user-facing summary of the change.
@@ -114,12 +114,15 @@ One-line, user-facing summary of the change.
 
 ## Releasing
 
-Releases are cut by promoting `main` → the `release` branch (see [RELEASING.md](./RELEASING.md) for the
-full flow and the SDK upgrade train). **`main` never publishes.**
+Trunk-based on `main`; there is no release branch. Merging a changeset to `main` opens a
+"Version Packages" PR, and **merging that PR is the release** — it tags each version and publishes to
+the registry. Plugins carry independent version lines but share one Version PR, so a release ships
+whatever accumulated. See [RELEASING.md](./RELEASING.md) for the full flow and the SDK upgrade train.
 
 ## Conventions
 
 - New packages must be `"private": true` (plugins publish to the registry via `dx registry publish`,
-  not npm).
+  not npm). Publishing to npm additionally needs a library build: the `exports` map describes
+  `dist/lib` + `dist/types`, which the plugin bundle does not emit.
 - PR titles use Conventional Commits: `feat(excalidraw): …`, `fix: …`, `refactor: …`, `docs: …`.
 - Before committing, run `git status` and account for every modified/untracked file.

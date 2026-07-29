@@ -1,4 +1,4 @@
-# dxos-plugin-excalidraw
+# @dxos/plugin-excalidraw
 
 Surface plugin for Excalidraw sketch entities in DXOS Composer.
 

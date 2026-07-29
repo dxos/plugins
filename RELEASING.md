@@ -28,13 +28,13 @@ this is the deterministic path for coding agents and scripts (no interactive pro
 
    ```markdown
    ---
-   'dxos-plugin-excalidraw': minor
+   '@dxos/plugin-excalidraw': minor
    ---
 
    Add a freehand arrow tool.
    ```
 
-2. The frontmatter key is the plugin's **`package.json` `name`** (e.g. `dxos-plugin-excalidraw`), not
+2. The frontmatter key is the plugin's **`package.json` `name`** (e.g. `@dxos/plugin-excalidraw`), not
    the directory. Add one `"name": bump` line per plugin the change touches.
 3. Choose the bump:
 
@@ -52,14 +52,22 @@ those.) Humans who prefer a prompt can run `pnpm changeset` instead; it writes t
 
 ## Releasing
 
-1. Merge the PR (with its changeset) to `main`, the development branch. CI builds it; **nothing
-   publishes**.
-2. **Cut a release:** promote `main` → the `release` branch. That triggers the **Release** workflow,
-   which opens a "Version Packages" PR (consumes the changesets → bumps versions + `CHANGELOG.md`);
-   merging it publishes the changed plugins to the registry.
+Trunk-based on `main` — there is no release branch.
 
-Only the plugins with a changeset are versioned/published — releases are independent, and `main` never
-publishes (releasing is always an explicit promotion to `release`).
+1. Merge the PR (with its changeset) to `main`. The **Release** workflow opens or updates a
+   **"Version Packages" PR** consuming the pending changesets (bumps versions + `CHANGELOG.md`).
+   Nothing publishes yet.
+2. **Merge the Version Packages PR.** That is the release. The workflow tags each released version
+   (`name@version`) and publishes those plugins to the registry.
+
+**Independent versions, coupled timing.** Each plugin has its own version line (`fixed: []`), so a
+change to one never bumps another. But there is a single Version Packages PR, and merging it drains
+_every_ pending changeset — so a release ships whatever accumulated since the last one. To release one
+plugin alone, merge the Version PR before adding another plugin's changeset.
+
+Releases are recorded as git tags rather than a branch. Plugins are `private: true` and never publish
+to npm, so `privatePackages.tag` is enabled to tag them anyway, and `changeset tag` stands in for
+`changeset publish` in the workflow.
 
 ## Keeping up with the SDK
 
@@ -118,17 +126,19 @@ Composer catches up.
 
 ## CI
 
-| Workflow              | Trigger            | Does                                                               |
-| --------------------- | ------------------ | ------------------------------------------------------------------ |
-| `check.yml`           | PR / push / queue  | format, lint, build (typecheck + bundle + manifest), test          |
-| `sdk-nightly.yml`     | nightly / dispatch | open/update the SDK upgrade PR from latest pkg.pr.new              |
-| `sdk-npm-release.yml` | dispatch (version) | pin catalog to npm + release-together changeset → PR               |
-| `release.yml`         | push to `release`  | Changesets version PR → `dx registry publish` per plugin (guarded) |
+| Workflow              | Trigger            | Does                                                                              |
+| --------------------- | ------------------ | --------------------------------------------------------------------------------- |
+| `check.yml`           | PR / push / queue  | format, lint, build (typecheck + bundle + manifest), test                         |
+| `sdk-nightly.yml`     | nightly / dispatch | open/update the SDK upgrade PR from latest pkg.pr.new                             |
+| `sdk-npm-release.yml` | dispatch (version) | pin catalog to npm + release-together changeset → PR                              |
+| `release.yml`         | push to `main`     | Changesets version PR → tag + `dx registry publish` per released plugin (guarded) |
 
 ## Secrets / prerequisites
 
 - `ATPROTO_HANDLE` + `ATPROTO_APP_PASSWORD` — a verified publisher identity for the release workflow
   (or wire `dx account login` for the DPoP path).
-- `@dxos/cli` must be installable (the release workflow runs `npm i -g @dxos/cli`).
+- The release workflow installs the CLI from `DX_CLI_PACKAGE` (repo variable), defaulting to a
+  pkg.pr.new preview because npm's `@dxos/cli@0.10.0` is broken — its binary embeds an absolute path
+  to the machine that built it. Point the variable at `@dxos/cli` once a working version is on npm.
 - The publisher DID must be verified by the registry's configured verifier, or published records
   won't appear in Composer (see the registry spec).
