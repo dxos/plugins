@@ -1,5 +1,23 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
 tasks:
+  # The registry bundle (mirrors dxos `bundle`): `vite build` runs `composerPlugin`, emitting
+  # out/manifest.json (incl. the resolved `dependencies` SDK-compat snapshot) alongside the
+  # self-contained bundle the registry serves.
+  bundle:
+    command: pnpm exec vite build
+    deps:
+      - ~:typecheck
+    inputs:
+      - /tsconfig.base.json
+      - tsconfig.json
+      - vite.config.ts
+      - dx.config.ts
+      - '@group(production)'
+    outputs:
+      - out
+    options:
+      timeout: 120
+
   dev:
     command: pnpm exec vite
     preset: server
@@ -7,7 +25,7 @@ tasks:
   preview:
     command: pnpm exec vite preview
     deps:
-      - ~:build
+      - bundle
     preset: server
 
 inheritedBy:

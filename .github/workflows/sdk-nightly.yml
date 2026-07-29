@@ -33,7 +33,9 @@ jobs:
         run: node scripts/set-sdk.mjs pkg-pr-new ${{ steps.sha.outputs.sha }}
       # Repinning the catalog invalidates the lockfile by design, so this cannot be frozen.
       - run: pnpm install --no-frozen-lockfile
-      - run: moon run :build
+      # Smoke both artifacts against the repinned SDK — the library and the composerPlugin bundle
+      # break in different ways.
+      - run: moon run :build :bundle
       - name: Open/update the SDK upgrade PR
         id: pr
         uses: peter-evans/create-pull-request@v6

@@ -5,6 +5,7 @@
   "description": "Monorepo of community plugins for DXOS Composer.",
   "scripts": {
     "build": "moon run :build",
+    "bundle": "moon run :bundle",
     "preview": "moon run :preview",
     "changeset": "changeset",
     "version-packages": "changeset version",

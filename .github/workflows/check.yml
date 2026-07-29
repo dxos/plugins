@@ -21,9 +21,10 @@ jobs:
       # Formatting first: it is the cheapest check and a single unformatted file fails the job.
       - run: pnpm run format-check
       - run: moon run :lint
-      # `:build` runs each plugin's typecheck + `vite build`, emitting dist/manifest.json
-      # (incl. the resolved `dependencies` SDK-compat snapshot).
+      # `:build` is the npm library (dist/lib + dist/types); `:bundle` is the registry bundle
+      # (out/, incl. manifest.json and the resolved `dependencies` SDK-compat snapshot).
       - run: moon run :build
+      - run: moon run :bundle
 
   # Separate from `check` so a growing suite does not extend the static checks, and so a red test is
   # distinguishable from a red build at a glance. The `test` moon task declares no build dependency —

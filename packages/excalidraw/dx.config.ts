@@ -17,6 +17,6 @@ export default Config2.make({
   },
   publish: {
     buildCommand: 'vite build',
-    outputDirectory: 'dist',
+    outputDirectory: 'out',
   },
 });

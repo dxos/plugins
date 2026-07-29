@@ -1,18 +1,18 @@
 name: Release
 
-# Changesets-driven release. `main` is the development branch (feature PRs + changesets land there);
-# a release is cut by promoting `main` → the `release` branch, which triggers this workflow. On push
-# to `release`:
-#  - if changesets are pending, opens/updates a "Version Packages" PR (bumps each changed plugin's
-#    version + CHANGELOG);
-#  - when that PR is merged (no changesets left), publishes the freshly-versioned plugins to the
-#    AT Protocol registry via `dx registry publish`.
-# Individual plugin features release on their own; an SDK bump (sdk-npm-release) bumps all → all
-# release together. The release guard forbids publishing against an unreleased (pkg.pr.new) SDK.
+# Changesets-driven release, trunk-based on `main` — there is no long-lived release branch, matching
+# dxos/dxos. Every push to `main`:
+#  - with changesets pending, opens/updates a "Version Packages" PR (bumps each changed plugin's
+#    version + CHANGELOG). Merging that PR is the human gate;
+#  - with none left, publishes the bumped plugins to npm (which also tags each version) and then to
+#    the AT Protocol registry via `dx registry publish`.
+#
+# Plugins carry independent version lines (`fixed: []`), but share one Version Packages PR, so a
+# release ships whatever accumulated since the last one — independent numbers, coupled timing.
 
 on:
   push:
-    branches: [release]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -41,32 +41,56 @@ jobs:
             exit 1
           fi
 
-      - uses: moonrepo/setup-toolchain@v0
-        with:
-          auto-install: true
+      - uses: ./.github/actions/setup
 
-      # Opens a "Version Packages" PR while changesets are pending; once merged, `hasChangesets`
-      # is false and the publish step below runs against the bumped versions.
+      # `files` ships dist/, so the library has to exist before changesets packs the tarball. The
+      # registry bundle is not built here — `dx registry publish` runs the `buildCommand` declared
+      # in each plugin's dx.config.ts itself.
+      - run: moon run :build
+
+      # `changeset publish` pushes to npm and tags each released version; `publishedPackages` then
+      # reports exactly what this run released, which drives the registry publish below.
       - id: changesets
         uses: changesets/action@v1
         with:
           version: pnpm version-packages
-          publish: echo "noop — registry publish handled below"
+          publish: pnpm exec changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish plugins to the registry
-        if: steps.changesets.outputs.hasChangesets == 'false'
+      # npm is the library channel; the registry is what Composer installs from. Both ship the same
+      # version, from different build outputs — dist/ for npm, out/ for the registry.
+      - name: Publish released plugins to the registry
+        if: steps.changesets.outputs.published == 'true'
         env:
-          # A verified publisher's credentials (or a CI publisher identity). The handle/app-password
-          # path writes directly to the PDS; `dx account login` is the alternative for the DPoP path.
+          # Pinned to a pkg.pr.new preview: npm's @dxos/cli@0.10.0 is broken (its binary embeds an
+          # absolute path to the machine that built it). Override with the DX_CLI_PACKAGE repo
+          # variable, and drop the default once a working CLI is on npm. Installing the single
+          # linux-x64 package rather than the launcher avoids fetching all five platforms.
+          DX_CLI_PACKAGE: ${{ vars.DX_CLI_PACKAGE || 'https://pkg.pr.new/dxos/dxos/@dxos/cli-linux-x64@4fb6037' }}
+          PUBLISHED: ${{ steps.changesets.outputs.publishedPackages }}
           ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
           ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
         run: |
-          npm install -g @dxos/cli
-          for dir in packages/*/; do
+          npm install -g "${DX_CLI_PACKAGE}"
+          # Fail fast on a broken CLI rather than part-way through publishing.
+          dx --version
+
+          # Publish only what this run released; the registry rejects a re-publish of an unchanged
+          # version, but relying on that would hide a genuine mistake.
+          node -e '
+            const fs = require("fs");
+            const released = new Set(JSON.parse(process.env.PUBLISHED).map((p) => p.name));
+            const dirs = fs.readdirSync("packages")
+              .filter((dir) => fs.existsSync(`packages/${dir}/package.json`))
+              .filter((dir) => released.has(JSON.parse(fs.readFileSync(`packages/${dir}/package.json`, "utf8")).name));
+            fs.writeFileSync("released-dirs.txt", dirs.map((dir) => `packages/${dir}`).join("\n"));
+          '
+
+          while read -r dir; do
+            [ -n "${dir}" ] || continue
             echo "::group::Publishing ${dir}"
-            # Re-publishing an unchanged version is rejected by the edge (immutable bundle); tolerate it.
-            dx registry publish --dir "${dir}" || echo "skipped ${dir} (already published or unchanged)"
+            dx registry publish --dir "${dir}"
             echo "::endgroup::"
-          done
+          done < released-dirs.txt

@@ -1,16 +1,19 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
 tasks:
-  # `vite build` runs `composerPlugin`, emitting dist/manifest.json (incl. the resolved
-  # `dependencies` SDK-compat snapshot) alongside the bundle.
+  # The npm library (mirrors dxos `build`): thin modules with dependencies externalised, plus
+  # declarations. The registry bundle is the separate `bundle` task (tag-vite.yml) — different
+  # artifact, different audience.
   build:
-    command: pnpm exec vite build
+    # vite emits the JS; declarations need tsc, which vite/rolldown never produce.
+    script: pnpm exec vite build --config vite.lib.config.ts && pnpm exec tsc -p tsconfig.lib.json
     deps:
       - ~:typecheck
     inputs:
       - /tsconfig.base.json
       - tsconfig.json
-      - vite.config.ts
-      - dx.config.ts
+      - tsconfig.lib.json
+      - vite.lib.config.ts
+      - package.json
       - '@group(production)'
     outputs:
       - dist
