@@ -11,7 +11,6 @@
 import * as Schema from 'effect/Schema';
 
 import { Annotation, DXN, Obj, Ref, Type } from '@dxos/echo';
-import type {} from '@dxos/echo/Entity';
 import { FormInputAnnotation, HiddenAnnotation } from '@dxos/echo/internal';
 import { CollectionItemAnnotation } from '@dxos/schema';
 
@@ -31,11 +30,15 @@ export class Canvas extends Type.makeObject<Canvas>(DXN.make('org.dxos.type.exca
   }).pipe(HiddenAnnotation.set(true)),
 ) {}
 
+// Annotated so declaration emit names the field through `Ref.RefSchema` — the inferred form expands
+// to `Entity.OfKind`, which tsc outside the dxos workspace can only name via the pnpm store path (TS2883).
+const canvasRef: Ref.RefSchema<Canvas> = Ref.Ref(Canvas);
+
 /** The user-facing Excalidraw object — a named handle around a canvas. */
 export class Excalidraw extends Type.makeObject<Excalidraw>(DXN.make('org.dxos.type.excalidraw', '0.1.0'))(
   Schema.Struct({
     name: Schema.String.pipe(Schema.optional),
-    canvas: Ref.Ref(Canvas).pipe(FormInputAnnotation.set(false)),
+    canvas: canvasRef.pipe(FormInputAnnotation.set(false)),
   }).pipe(
     Annotation.IconAnnotation.set({ icon: 'ph--compass-tool--regular', hue: 'indigo' }),
     // Without this a new sketch is filed under the database section's `types/<slug>` subtree rather
@@ -49,7 +52,7 @@ export type MakeOptions = Omit<Obj.MakeProps<typeof Excalidraw>, 'canvas'> & {
 };
 
 /** Construct a new Excalidraw + Canvas pair, linked by Ref. */
-export const make = ({ canvas: canvasProps, ...props }: MakeOptions = {}) => {
+export const make = ({ canvas: canvasProps, ...props }: MakeOptions = {}): Obj.OfShape<Excalidraw> => {
   const { schema = EXCALIDRAW_SCHEMA, content = {} } = canvasProps ?? {};
   const canvas = Obj.make(Canvas, { schema, content });
   return Obj.make(Excalidraw, { ...props, canvas: Ref.make(canvas) });
