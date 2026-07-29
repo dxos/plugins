@@ -38,7 +38,7 @@ export default Config2.make({
       compact view suitable for embedding in dashboards or space overview panels.
     `,
     icon: { key: 'ph--hash-straight--regular', hue: 'cyan' },
-    source: 'https://github.com/dxos/plugin-excalidraw/tree/main/packages/tictactoe',
+    source: 'https://github.com/dxos/plugins/tree/main/packages/tictactoe',
     spec: 'PLUGIN.mdl',
     tags: ['labs', 'game'],
     dependsOn: ['org.dxos.plugin.game'],
