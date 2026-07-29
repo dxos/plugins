@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "#capabilities": ["./src/capabilities/index.ts"],
+      "#components": ["./src/components/index.ts"],
+      "#containers": ["./src/containers/index.ts"],
+      "#meta": ["./src/meta.ts"],
+      "#operations": ["./src/operations/index.ts"],
+      "#plugin": ["./src/TicTacToePlugin.tsx"],
+      "#translations": ["./src/translations.ts"],
+      "#types": ["./src/types/index.ts"]
+    }
+  },
+  "include": ["src"]
+}
