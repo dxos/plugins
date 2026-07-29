@@ -11,6 +11,11 @@ ask an a-or-b question, number the options.
 
 - `pnpm install`, then `moon run :build` (typecheck + `vite build` + manifest). `moon run :build`
   builds all.
+- **Two build outputs, two audiences.** `:build` bundles the plugin for the registry into `out/`,
+  with every dependency inlined so Composer loads one self-contained artifact. `:build-lib` emits the
+  npm library into `dist/` (`dist/lib` JS with dependencies externalised, `dist/types` declarations
+  from `tsc`). Only `dist` and `src` ship to npm — `out/` must never reach the tarball, or consumers
+  get a second copy of React, Effect and the SDK.
 - Tasks are **tag-based**, never per-project: a plugin's `moon.yml` declares `tags`, and each tag
   inherits the matching `/.moon/tasks/tag-<tag>.yml`. Available tags → tasks:
   `typecheck` → `typecheck` · `ts-vite-build` → `build` · `ts-test` → `test`, `test-watch` ·
@@ -121,8 +126,9 @@ whatever accumulated. See [RELEASING.md](./RELEASING.md) for the full flow and t
 
 ## Conventions
 
-- New packages must be `"private": true` (plugins publish to the registry via `dx registry publish`,
-  not npm). Publishing to npm additionally needs a library build: the `exports` map describes
-  `dist/lib` + `dist/types`, which the plugin bundle does not emit.
+- New packages must be `"private": true` until they are ready to publish (plugins reach Composer via
+  `dx registry publish`; npm is the secondary channel). A publishable plugin needs the `ts-vite-build`
+  tag for both `:build` and `:build-lib`, and its `exports`/`imports` maps must point at what
+  `:build-lib` emits.
 - PR titles use Conventional Commits: `feat(excalidraw): …`, `fix: …`, `refactor: …`, `docs: …`.
 - Before committing, run `git status` and account for every modified/untracked file.

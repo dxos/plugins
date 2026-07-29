@@ -1,8 +1,9 @@
 # Releasing
 
-This monorepo hosts community plugins for DXOS Composer. Plugins are **released to the AT Protocol
-registry** via `dx registry publish` (bundle → DXOS edge, records → the publisher's PDS) — they are
-not published to npm. [Changesets](https://github.com/changesets/changesets) manages versions and
+This monorepo hosts community plugins for DXOS Composer. A release publishes each plugin to **two
+channels from two build outputs**: the **npm library** (`dist/lib` + `dist/types`, dependencies
+externalised) and the **AT Protocol registry** via `dx registry publish` (the self-contained `out/`
+bundle → DXOS edge, records → the publisher's PDS). `out/` never ships to npm. [Changesets](https://github.com/changesets/changesets) manages versions and
 changelogs; the DXOS SDK is pinned centrally via the `dxos` catalog in `pnpm-workspace.yaml`.
 
 ## Layout
@@ -57,17 +58,17 @@ Trunk-based on `main` — there is no release branch.
 1. Merge the PR (with its changeset) to `main`. The **Release** workflow opens or updates a
    **"Version Packages" PR** consuming the pending changesets (bumps versions + `CHANGELOG.md`).
    Nothing publishes yet.
-2. **Merge the Version Packages PR.** That is the release. The workflow tags each released version
-   (`name@version`) and publishes those plugins to the registry.
+2. **Merge the Version Packages PR.** That is the release. The workflow publishes to npm (which tags
+   each released version as `name@version`), then publishes the same versions to the registry.
 
 **Independent versions, coupled timing.** Each plugin has its own version line (`fixed: []`), so a
 change to one never bumps another. But there is a single Version Packages PR, and merging it drains
 _every_ pending changeset — so a release ships whatever accumulated since the last one. To release one
 plugin alone, merge the Version PR before adding another plugin's changeset.
 
-Releases are recorded as git tags rather than a branch. Plugins are `private: true` and never publish
-to npm, so `privatePackages.tag` is enabled to tag them anyway, and `changeset tag` stands in for
-`changeset publish` in the workflow.
+Releases are recorded as git tags rather than a branch — `changeset publish` creates them. A plugin
+that is not yet ready to publish stays `private: true`; `privatePackages.tag` is enabled so those
+are still versioned and tagged.
 
 ## Keeping up with the SDK
 
@@ -135,6 +136,8 @@ Composer catches up.
 
 ## Secrets / prerequisites
 
+- `NPM_TOKEN` — publish rights to the `@dxos` scope on npm. Without it `changeset publish` fails and
+  nothing reaches either channel, since the registry publish is gated on its output.
 - `ATPROTO_HANDLE` + `ATPROTO_APP_PASSWORD` — a verified publisher identity for the release workflow
   (or wire `dx account login` for the DPoP path).
 - The release workflow installs the CLI from `DX_CLI_PACKAGE` (repo variable), defaulting to a

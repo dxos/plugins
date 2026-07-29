@@ -8,6 +8,8 @@ import * as Schema from 'effect/Schema';
 
 import { Operation } from '@dxos/compute';
 import { DXN, Ref } from '@dxos/echo';
+import type {} from '@dxos/echo/Entity';
+import type {} from '@dxos/echo/Obj';
 
 import { meta } from '#meta';
 

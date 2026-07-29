@@ -11,6 +11,7 @@
 import * as Schema from 'effect/Schema';
 
 import { Annotation, DXN, Obj, Ref, Type } from '@dxos/echo';
+import type {} from '@dxos/echo/Entity';
 import { FormInputAnnotation, HiddenAnnotation } from '@dxos/echo/internal';
 import { CollectionItemAnnotation } from '@dxos/schema';
 
