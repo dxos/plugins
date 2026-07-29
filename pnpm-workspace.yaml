@@ -48,7 +48,15 @@ catalogs:
     '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@6be8009'
     '@dxos/eslint-plugin-rules': 'https://pkg.pr.new/dxos/dxos/@dxos/eslint-plugin-rules@6be8009'
     '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@6be8009'
+    '@dxos/plugin-client': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-client@6be8009'
     '@dxos/plugin-game': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-game@6be8009'
+    '@dxos/plugin-testing': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-testing@6be8009'
     '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@6be8009'
     '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@6be8009'
     '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@6be8009'
+
+# pnpm 10 blocks dependency build scripts by default. `better-sqlite3` is a native addon the client
+# loads when a plugin-activation test boots a real client, and without its compiled binding the
+# harness fails to construct one.
+onlyBuiltDependencies:
+  - better-sqlite3

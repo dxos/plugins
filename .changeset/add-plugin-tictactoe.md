@@ -1,5 +1,5 @@
 ---
-'@dxos/plugin-tictactoe': minor
+'@dxos/plugin-tictactoe': patch
 ---
 
-Add Tic-Tac-Toe plugin as the canonical external community plugin example.
+Publish Tic-Tac-Toe from the community plugins repo, continuing the version line from the DXOS monorepo.
