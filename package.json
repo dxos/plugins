@@ -2,7 +2,7 @@
   "name": "composer-plugins",
   "private": true,
   "type": "module",
-  "description": "Monorepo of community plugins for DXOS Composer.",
+  "description": "DXOS team plugins for DXOS Composer.",
   "scripts": {
     "build": "moon run :build",
     "bundle": "moon run :bundle",

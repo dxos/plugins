@@ -1,6 +1,7 @@
 # Composer plugins
 
-A monorepo of community plugins for [DXOS Composer](https://dxos.org/composer).
+The DXOS team's plugins for [DXOS Composer](https://dxos.org/composer), developed and released
+outside the main [dxos/dxos](https://github.com/dxos/dxos) monorepo.
 
 Each plugin lives under [`packages/`](./packages) with its own `package.json`, `dx.config.ts`, and Vite
 build. All plugins share one DXOS SDK version via the `dxos` catalog in
