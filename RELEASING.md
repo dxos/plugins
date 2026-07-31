@@ -1,6 +1,6 @@
 # Releasing
 
-This monorepo hosts community plugins for DXOS Composer. A release publishes each plugin to **two
+This monorepo hosts the DXOS team's plugins for Composer. A release publishes each plugin to **two
 channels from two build outputs**: the **npm library** (`dist/lib` + `dist/types`, dependencies
 externalised) and the **AT Protocol registry** via `dx registry publish` (the self-contained `out/`
 bundle → DXOS edge, records → the publisher's PDS). `out/` never ships to npm. [Changesets](https://github.com/changesets/changesets) manages versions and
@@ -145,6 +145,11 @@ Composer catches up.
     this in CI.
 - `ATPROTO_HANDLE` + `ATPROTO_APP_PASSWORD` — a verified publisher identity for the release workflow
   (or wire `dx account login` for the DPoP path).
+- `GH_DXOS_BOT_PAT` — dxos-bot's PAT (`contents: write` + `pull-requests: write`), used by
+  **SDK nightly** to open its PR. Without it the PR is authored by `github-actions[bot]`, and
+  GitHub suppresses workflow triggers for `GITHUB_TOKEN`-authored events — so `check.yml` never runs,
+  auto-merge never fires, and the PR sits open being re-pinned nightly. The workflow logs a warning
+  when the secret is absent.
 - The release workflow installs the CLI from `DX_CLI_PACKAGE` (repo variable), defaulting to a
   pkg.pr.new preview because npm's `@dxos/cli@0.10.0` is broken — its binary embeds an absolute path
   to the machine that built it. Point the variable at `@dxos/cli` once a working version is on npm.

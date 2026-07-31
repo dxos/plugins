@@ -1,8 +1,9 @@
 # Agent guide — composer-plugins
 
-A pnpm + moon monorepo of community plugins for DXOS Composer. Each plugin is `packages/<name>/`
-(its own `package.json`, `dx.config.ts`, `vite.config.ts`, `src/`). All plugins share one DXOS SDK
-version via the `dxos` catalog in `pnpm-workspace.yaml`.
+A pnpm + moon monorepo of the DXOS team's plugins for Composer, developed and released outside the
+dxos/dxos monorepo. Each plugin is `packages/<name>/` (its own `package.json`, `dx.config.ts`,
+`vite.config.ts`, `src/`). All plugins share one DXOS SDK version via the `dxos` catalog in
+`pnpm-workspace.yaml`.
 
 **Always test your work after each step.** If unsure how to implement something, ask — and when you
 ask an a-or-b question, number the options.

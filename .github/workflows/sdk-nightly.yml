@@ -4,6 +4,9 @@ name: SDK nightly (pkg.pr.new)
 # single "SDK upgrade" PR pointing the `dxos` catalog at the latest pkg.pr.new build. These pins
 # may merge to `main` (keeps CI building against the latest SDK), but the release workflow refuses
 # to publish against a pkg.pr.new pin — a published npm SDK release goes through `sdk-npm-release`.
+#
+# The PR branch is fixed (`sdk-upgrade`), so a PR that has not landed is re-pinned to the newest SDK
+# each night rather than accumulating a queue of stale PRs — whenever it does land, it lands current.
 
 on:
   schedule:
@@ -17,6 +20,9 @@ permissions:
 jobs:
   upgrade:
     runs-on: ubuntu-latest
+    env:
+      # Exposed so a step condition can branch on token presence: secrets are not allowed in `if:`.
+      GH_DXOS_BOT_PAT: ${{ secrets.GH_DXOS_BOT_PAT }}
     steps:
       - uses: actions/checkout@v4
       # Seven characters exactly: pkg.pr.new emits 7-char SHAs in the @dxos/* cross-package
@@ -36,10 +42,21 @@ jobs:
       # Smoke both artifacts against the repinned SDK — the library and the composerPlugin bundle
       # break in different ways.
       - run: moon run :build :bundle
+      # A PR opened with the default GITHUB_TOKEN does not trigger workflows — GitHub suppresses
+      # those events to prevent recursion — so `check.yml` never runs on it and auto-merge waits
+      # forever on checks that never arrive. Authoring as a PAT/App identity makes the
+      # `pull_request` event fire normally.
+      - name: Warn when the bot PAT is missing
+        if: ${{ env.GH_DXOS_BOT_PAT == '' }}
+        run: |
+          echo "::warning::GH_DXOS_BOT_PAT is not set; the PR is authored by github-actions[bot], so no" \
+            "checks run on it and auto-merge can never fire. See RELEASING.md."
+
       - name: Open/update the SDK upgrade PR
         id: pr
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.GH_DXOS_BOT_PAT || secrets.GITHUB_TOKEN }}
           branch: sdk-upgrade
           commit-message: 'chore(sdk): track dxos/main@${{ steps.sha.outputs.sha }}'
           title: 'chore(sdk): track dxos/main@${{ steps.sha.outputs.sha }}'
@@ -61,7 +78,7 @@ jobs:
       - name: Enable auto-merge
         if: steps.pr.outputs.pull-request-number
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_DXOS_BOT_PAT || secrets.GITHUB_TOKEN }}
         run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
 
       # A silent nightly failure is the hazard this workflow exists to prevent: tracking stops, and

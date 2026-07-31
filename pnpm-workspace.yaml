@@ -1,4 +1,4 @@
-# Composer community plugins — pnpm workspace.
+# DXOS Composer plugins — pnpm workspace.
 #
 # Every plugin under packages/* pins the DXOS SDK via the `dxos` named catalog below.
 # The SDK ships as a single unit, so one find-replace of the version/commit here bumps
