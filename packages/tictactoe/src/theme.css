@@ -1,0 +1,25 @@
+/**
+ * Utilities for this plugin's own markup.
+ *
+ * Composer's stylesheet is built from the dxos monorepo's sources, so it only contains utilities
+ * some in-repo file happens to use. A plugin loaded from the registry is never scanned by that
+ * build, and any class it uses that Composer does not already emit — every arbitrary value, in
+ * particular — resolves to nothing. Compiling here closes that gap.
+ *
+ * Layer order must match `@dxos/ui-theme`'s `main.css`, since the host establishes these layers and
+ * `utilities` has to stay last to win over the base and component layers.
+ */
+@layer properties, theme, dx-tokens, user-tokens, base, tw-base, dx-base, components, tw-components, dx-components, utilities;
+
+/**
+ * Theme (custom properties) and utilities only — no preflight. Preflight is a global reset the host
+ * already applies; emitting it again from a lazily-injected stylesheet would restyle the whole app.
+ */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+
+/** With `source(none)` above, this is the only tree scanned for classes. */
+@source '.';
+
+/** Matches the host's class-based dark mode so `dark:` utilities resolve against Composer's toggle. */
+@variant dark (&:where(.dark, .dark *));

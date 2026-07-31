@@ -29,13 +29,13 @@ this is the deterministic path for coding agents and scripts (no interactive pro
 
    ```markdown
    ---
-   '@dxos/plugin-excalidraw': minor
+   '@dxos/plugin-tictactoe': minor
    ---
 
-   Add a freehand arrow tool.
+   Add AI difficulty levels.
    ```
 
-2. The frontmatter key is the plugin's **`package.json` `name`** (e.g. `@dxos/plugin-excalidraw`), not
+2. The frontmatter key is the plugin's **`package.json` `name`** (e.g. `@dxos/plugin-tictactoe`), not
    the directory. Add one `"name": bump` line per plugin the change touches.
 3. Choose the bump:
 
@@ -136,8 +136,13 @@ Composer catches up.
 
 ## Secrets / prerequisites
 
-- `NPM_TOKEN` — publish rights to the `@dxos` scope on npm. Without it `changeset publish` fails and
-  nothing reaches either channel, since the registry publish is gated on its output.
+- **npm: a trusted publisher (OIDC), not a token.** Each plugin is configured on npmjs.com to trust
+  this repository's `release.yml`, and the workflow requests an `id-token` — so there is no npm secret
+  to hold or rotate. Renaming the workflow file breaks OIDC for every plugin.
+  - A plugin npm has never seen cannot have a trusted publisher yet, so its first publish is manual;
+    keep it `private: true` until then, or `changeset publish` fails and takes the rest of the release
+    with it (the registry publish is gated on its output). `pnpm check-packages-published` enforces
+    this in CI.
 - `ATPROTO_HANDLE` + `ATPROTO_APP_PASSWORD` — a verified publisher identity for the release workflow
   (or wire `dx account login` for the DPoP path).
 - The release workflow installs the CLI from `DX_CLI_PACKAGE` (repo variable), defaulting to a

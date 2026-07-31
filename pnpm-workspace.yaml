@@ -21,9 +21,8 @@ packages:
 catalog:
   '@changesets/changelog-git': '^0.2.1'
   '@changesets/cli': '^2.27.10'
-  '@effect-atom/atom-react': '^0.5.0'
-  '@excalidraw/excalidraw': '^0.18.0'
   '@storybook/react-vite': '^10.4.2'
+  '@tailwindcss/vite': '4.3.3'
   '@types/react': '~19.2.17'
   '@types/react-dom': '~19.2.3'
   '@vitejs/plugin-react': '^6.0.3'
@@ -37,9 +36,9 @@ catalog:
   react: '~19.2.7'
   react-dom: '~19.2.7'
   storybook: '^10.4.2'
+  tailwindcss: '4.3.3'
   typescript: '^6.0.3'
   vite: '^8.1.4'
-  vite-plugin-wasm: '^3.6.0'
   vitest: '4.1.10'
 
 catalogs:
@@ -48,14 +47,18 @@ catalogs:
     '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@6be8009'
     '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@6be8009'
     '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@6be8009'
-    '@dxos/echo-client': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-client@6be8009'
-    '@dxos/echo-doc': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-doc@6be8009'
     '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@6be8009'
-    '@dxos/effect': 'https://pkg.pr.new/dxos/dxos/@dxos/effect@6be8009'
     '@dxos/eslint-plugin-rules': 'https://pkg.pr.new/dxos/dxos/@dxos/eslint-plugin-rules@6be8009'
     '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@6be8009'
-    '@dxos/plugin-space': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-space@6be8009'
+    '@dxos/plugin-client': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-client@6be8009'
+    '@dxos/plugin-game': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-game@6be8009'
+    '@dxos/plugin-testing': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-testing@6be8009'
     '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@6be8009'
-    '@dxos/react-ui-form': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui-form@6be8009'
-    '@dxos/schema': 'https://pkg.pr.new/dxos/dxos/@dxos/schema@6be8009'
+    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@6be8009'
     '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@6be8009'
+
+# pnpm 10 blocks dependency build scripts by default. `better-sqlite3` is a native addon the client
+# loads when a plugin-activation test boots a real client, and without its compiled binding the
+# harness fails to construct one.
+onlyBuiltDependencies:
+  - better-sqlite3

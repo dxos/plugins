@@ -16,6 +16,11 @@ ask an a-or-b question, number the options.
   for the registry into `out/`, with every dependency inlined so Composer loads one self-contained
   artifact. Only `dist` and `src` ship to npm — `out/` must never reach the tarball, or consumers
   get a second copy of React, Effect and the SDK.
+- **A plugin compiles its own stylesheet.** Composer's CSS is generated from the dxos monorepo's
+  sources, so a registry-loaded plugin is never scanned: any class it uses that Composer does not
+  already emit — every arbitrary value like `max-w-[30rem]` — silently resolves to nothing. Each
+  plugin therefore has `src/theme.css`, imports it from its plugin entry, and runs `tailwindcss()` in
+  **both** vite configs. Full wiring and the post-build check → `composer-plugins` skill, "Styling".
 - Tasks are **tag-based**, never per-project: a plugin's `moon.yml` declares `tags`, and each tag
   inherits the matching `/.moon/tasks/tag-<tag>.yml`. Available tags → tasks:
   `typecheck` → `typecheck` · `ts-vite-build` → `build` · `ts-test` → `test`, `test-watch` ·
@@ -103,7 +108,7 @@ on the interactive `pnpm changeset`). Create `.changeset/<short-kebab-summary>.m
 
 ```markdown
 ---
-'@dxos/plugin-excalidraw': patch
+'@dxos/plugin-tictactoe': patch
 ---
 
 One-line, user-facing summary of the change.
@@ -126,9 +131,13 @@ whatever accumulated. See [RELEASING.md](./RELEASING.md) for the full flow and t
 
 ## Conventions
 
-- New packages must be `"private": true` until they are ready to publish (plugins reach Composer via
-  `dx registry publish`; npm is the secondary channel). A publishable plugin needs the `ts-vite-build`
-  tag (`:build`, the npm library) and the `vite` tag (`:bundle`, the registry artifact), and its
-  `exports`/`imports` maps must point at what `:build` emits.
-- PR titles use Conventional Commits: `feat(excalidraw): …`, `fix: …`, `refactor: …`, `docs: …`.
+- **New packages stay `"private": true` until npm has seen them.** npm auth is a per-package trusted
+  publisher (OIDC), which cannot exist before the package does — so a publishable plugin npm has never
+  seen fails `changeset publish` and takes the whole release with it. Drop the flag only after the
+  first manual publish and trusted-publisher setup; `pnpm check-packages-published` enforces this in
+  CI. Plugins reach Composer via `dx registry publish`; npm is the secondary channel.
+- A publishable plugin needs the `ts-vite-build` tag (`:build`, the npm library) and the `vite` tag
+  (`:bundle`, the registry artifact), and its `exports`/`imports` maps must point at what `:build`
+  emits.
+- PR titles use Conventional Commits: `feat(tictactoe): …`, `fix: …`, `refactor: …`, `docs: …`.
 - Before committing, run `git status` and account for every modified/untracked file.

@@ -10,6 +10,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "format": "oxfmt",
+    "check-packages-published": "node scripts/check-packages-published.mjs",
     "format-check": "oxfmt --check",
     "lint": "pnpm exec moon run :lint-fix",
     "lint-check": "pnpm exec moon run :lint",
