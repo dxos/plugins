@@ -6,6 +6,9 @@ Session-logged learnings and corrections. Newest section first. See `SKILL.md` f
 
 - A plugin's Tailwind classes are dead unless the plugin compiles its own stylesheet — Composer's CSS
   scans only the dxos monorepo. Fix the pipeline; never route around it with inline styles.
+- Never depend on utilities Composer happens to bundle: that set is a by-product of in-repo usage,
+  not a contract, and shifts under you. Compile every class the plugin uses; depend only on token
+  values, which the host defines at runtime (`@dxos/ui-theme/tokens.css` registers the names).
 - `Obj.update`'s callback parameter is already `Obj.Mutable<T>`. An `as Obj.Mutable<typeof x>` cast
   inside it is never load-bearing — it only suppresses the error that the subject is a frozen
   snapshot. Delete the cast and fix the subject.

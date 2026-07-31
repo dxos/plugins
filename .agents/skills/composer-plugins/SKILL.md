@@ -518,11 +518,29 @@ grep 'max-w' packages/<name>/out/assets/*.css
 An empty result means that class is dead in Composer. Confirm the stylesheet is listed in
 `out/manifest.json#assets` too.
 
-Only **stock** Tailwind utilities can be compiled this way. DXOS token utilities (`bg-l1-surface`
-etc.) are defined by `@dxos/ui-theme`'s `@theme` extensions, whose CSS the package does not export —
-a plugin gets those only when Composer already emits them. Prefer stock utilities and the theme
-tokens Composer is known to ship; do not invent utilities (`max-is-*` and other logical-property
-variants do not exist in this codebase — grep before using one).
+### Never rely on what the host happens to bundle
+
+**Compile every class you use.** Composer's utility set is a by-product of which classes its own
+source files happen to contain — it is not a contract, and it changes as in-repo usage changes. A
+plugin that leans on it works by luck and breaks on an unrelated Composer change, silently. The only
+stable contract is the **design tokens**: the host defines their values at runtime, which is what
+makes a plugin follow the active theme.
+
+Stock Tailwind utilities compile from the entry above. Token-backed ones (`bg-base-surface`) need the
+token names registered with Tailwind, via `@dxos/ui-theme`'s token export:
+
+```css
+@import 'tailwindcss/theme.css' layer(theme);
+@import '@dxos/ui-theme/tokens.css' layer(theme); /* token names; values come from the host. */
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+```
+
+This needs an SDK newer than the pinned `dxos` catalog build — until the pin advances, that import
+fails with `"./tokens.css" is not exported`, so stick to stock utilities for now.
+
+Do not invent utilities: `max-is-*` and other logical-property variants do not exist in this
+codebase — grep before using one. With the gap above, a made-up class and a real one fail
+identically.
 
 See: `packages/tictactoe/src/theme.css`, `packages/tictactoe/vite.config.ts`.
 
