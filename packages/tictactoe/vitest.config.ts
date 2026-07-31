@@ -5,7 +5,7 @@
 import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { defineConfig, type Plugin } from 'vitest/config';
+import { type Plugin, defineConfig } from 'vitest/config';
 
 const packageRoot = fileURLToPath(new URL('.', import.meta.url));
 

@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { AppSurface } from '@dxos/app-toolkit/ui';
 import { Obj } from '@dxos/echo';
-import { useObject } from '@dxos/echo-react';
+import { useObject, useResolveRef } from '@dxos/echo-react';
 import { type GameVariantSurfaceProps } from '@dxos/plugin-game/types';
 import { Panel, Toolbar, useTranslation } from '@dxos/react-ui';
 import { mx } from '@dxos/ui-theme';
@@ -25,14 +25,17 @@ import { TicTacToe } from '#types';
 
 export type TicTacToeArticleProps = GameVariantSurfaceProps;
 
-export const TicTacToeArticle = ({ role, variant }: TicTacToeArticleProps) => {
+export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
   const { t } = useTranslation(meta.profile.key);
   const [aiThinking, setAiThinking] = useState(false);
   const aiTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const boardRef = useRef<string>('');
   const movesRef = useRef<string>('');
 
-  const state = Obj.instanceOf(TicTacToe.State, variant) ? variant : undefined;
+  // The `variant` prop is a frozen snapshot, so resolving the ref is what yields the live object
+  // `Obj.update` can write through.
+  const target = useResolveRef(game.variant);
+  const state = Obj.instanceOf(TicTacToe.State, target) ? target : undefined;
 
   const [board] = useObject(state, 'board');
   const [moves] = useObject(state, 'moves');
@@ -62,10 +65,8 @@ export const TicTacToeArticle = ({ role, variant }: TicTacToeArticleProps) => {
       const newMoves = moves ? `${moves};${moveEntry}` : moveEntry;
 
       Obj.update(state, (state) => {
-        // ECHO's mutation API requires Mutable<T> to write through the proxy layer.
-        const mutable = state as Obj.Mutable<typeof state>;
-        mutable.board = result.board;
-        mutable.moves = newMoves;
+        state.board = result.board;
+        state.moves = newMoves;
       });
     },
     [board, size, moves, isGameOver, aiThinking, state],
@@ -104,10 +105,8 @@ export const TicTacToeArticle = ({ role, variant }: TicTacToeArticleProps) => {
       const newMoves = currentMoves ? `${currentMoves};${moveEntry}` : moveEntry;
 
       Obj.update(state, (state) => {
-        // ECHO's mutation API requires Mutable<T> to write through the proxy layer.
-        const mutable = state as Obj.Mutable<typeof state>;
-        mutable.board = newBoard;
-        mutable.moves = newMoves;
+        state.board = newBoard;
+        state.moves = newMoves;
       });
       setAiThinking(false);
     }, 400);
@@ -125,10 +124,8 @@ export const TicTacToeArticle = ({ role, variant }: TicTacToeArticleProps) => {
     }
     const newBoard = makeBoard(size ?? 3);
     Obj.update(state, (state) => {
-      // ECHO's mutation API requires Mutable<T> to write through the proxy layer.
-      const mutable = state as Obj.Mutable<typeof state>;
-      mutable.board = newBoard;
-      mutable.moves = '';
+      state.board = newBoard;
+      state.moves = '';
     });
   }, [state, size]);
 

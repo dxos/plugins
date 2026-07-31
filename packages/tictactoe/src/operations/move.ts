@@ -36,10 +36,8 @@ const handler: Operation.WithHandler<typeof TicTacToeOperation.MakeMove> = TicTa
       const moves = variant.moves ? `${variant.moves};${moveEntry}` : moveEntry;
 
       Obj.update(variant, (variant) => {
-        // ECHO's mutation API requires Mutable<T> to write through the proxy layer.
-        const mutable = variant as Obj.Mutable<typeof variant>;
-        mutable.board = result.board;
-        mutable.moves = moves;
+        variant.board = result.board;
+        variant.moves = moves;
       });
 
       return { board: result.board, status };
