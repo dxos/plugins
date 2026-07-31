@@ -124,6 +124,8 @@ Phase 1, before the PR. The skeleton should include:
 11. `src/capabilities/react-surface.tsx` — one surface for the `article` role.
 12. `src/containers/` — one container (e.g., `FooArticle`) with lazy export and basic storybook.
 13. `src/components/` — empty barrel, ready for primitives.
+14. `src/theme.css` — the plugin's stylesheet, imported from `FooPlugin.tsx`, with `tailwindcss()` in both
+    vite configs. Without it every class the host does not already emit is silently dead (see Styling).
 
 Build and lint the skeleton before adding features.
 Add capabilities incrementally as needed (operations, skills, settings, etc.).
@@ -141,7 +143,8 @@ plugin-foo/
     plugin.ts               # Plugin.lazy() wrapper; consumed via @dxos/plugin-foo/plugin.
     meta.ts                 # Plugin.Meta (id, name, description, icon, iconHue).
     translations.ts         # i18n resources keyed by typename and meta.id.
-    FooPlugin.tsx           # Plugin definition via Plugin.define(meta).pipe().
+    FooPlugin.tsx           # Plugin definition via Plugin.define(meta).pipe(); imports ./theme.css.
+    theme.css               # Plugin's own Tailwind build (see Styling) — without it, classes silently no-op.
     skills/             # AI skill definitions.
       index.ts
     capabilities/           # Lazy capability modules (one file each).
@@ -464,6 +467,64 @@ A plugin's `moon.yml` declares no tasks of its own — it lists `tags`, and each
 (dev/preview), `storybook`.
 
 See: `packages/tictactoe/moon.yml`
+
+## Styling
+
+**A plugin compiles its own stylesheet.** Composer's CSS is generated from the dxos monorepo's own
+sources (`@dxos/ui-theme`'s `main.css` scans `packages/**`). A plugin loaded from the registry is not
+in that tree, so it is never scanned: a class Composer does not already emit for its own reasons
+produces no rule, the element renders unstyled, and **nothing warns you**. Arbitrary values
+(`max-w-[30rem]`, `w-[42px]`) are the usual casualty — common utilities like `flex` survive only
+because some in-repo file happens to use them.
+
+Four things must be wired up, or styling silently does nothing:
+
+1. **`src/theme.css`** — the plugin's stylesheet entry:
+
+   ```css
+   /* Layer order must match @dxos/ui-theme's main.css; `utilities` stays last so it wins. */
+   @layer properties, theme, dx-tokens, user-tokens, base, tw-base, dx-base, components, tw-components,
+     dx-components, utilities;
+
+   /* Theme + utilities only. NEVER import preflight: it is a global reset the host already applies,
+      and re-emitting it from an injected stylesheet restyles the whole app. */
+   @import 'tailwindcss/theme.css' layer(theme);
+   @import 'tailwindcss/utilities.css' layer(utilities) source(none);
+
+   /* With source(none) above, this is the only tree scanned. */
+   @source '.';
+
+   /* Match the host's class-based dark mode so `dark:` utilities resolve. */
+   @variant dark (&:where(.dark, .dark *));
+   ```
+
+2. **Import it from the plugin entry** (`src/FooPlugin.tsx`): `import './theme.css';`
+3. **`tailwindcss()` in _both_ vite configs** — `vite.config.ts` (bundle) and `vite.lib.config.ts`
+   (library). Omitting it from the library build fails with
+   `[lightningcss minify] Unexpected token Function("source")`, because Tailwind's at-rules reach the
+   CSS minifier unprocessed.
+4. **`@tailwindcss/vite` + `tailwindcss` as devDependencies** (`catalog:`), and a `./styles.css`
+   export pointing at what the library build emits, for npm consumers.
+
+`composerPlugin` does the rest: it lists the emitted stylesheet in `manifest.json#assets`, and the
+host injects a `<link>` for it when the plugin is installed.
+
+**Verify after `:bundle`** — check the class you rely on actually made it:
+
+```bash
+grep 'max-w' packages/<name>/out/assets/*.css
+```
+
+An empty result means that class is dead in Composer. Confirm the stylesheet is listed in
+`out/manifest.json#assets` too.
+
+Only **stock** Tailwind utilities can be compiled this way. DXOS token utilities (`bg-l1-surface`
+etc.) are defined by `@dxos/ui-theme`'s `@theme` extensions, whose CSS the package does not export —
+a plugin gets those only when Composer already emits them. Prefer stock utilities and the theme
+tokens Composer is known to ship; do not invent utilities (`max-is-*` and other logical-property
+variants do not exist in this codebase — grep before using one).
+
+See: `packages/tictactoe/src/theme.css`, `packages/tictactoe/vite.config.ts`.
 
 ## Coding Style
 
