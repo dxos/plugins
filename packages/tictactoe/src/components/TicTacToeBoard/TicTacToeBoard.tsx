@@ -79,7 +79,7 @@ export const TicTacToeBoard = ({
 
   return (
     <div
-      className='aspect-square w-full max-w-[400px]'
+      className='aspect-square w-full'
       style={{ display: 'grid', gridTemplateColumns: `repeat(${size}, 1fr)`, gap: '4px' }}
     >
       {Array.from({ length: size * size }, (_, index) => {
