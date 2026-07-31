@@ -16,6 +16,16 @@ ask an a-or-b question, number the options.
   for the registry into `out/`, with every dependency inlined so Composer loads one self-contained
   artifact. Only `dist` and `src` ship to npm — `out/` must never reach the tarball, or consumers
   get a second copy of React, Effect and the SDK.
+- **A plugin compiles its own stylesheet.** Composer's CSS is built from the dxos monorepo's sources,
+  so it only contains utilities some in-repo file happens to use; a plugin loaded from the registry
+  is never scanned by that build, and any class it uses that Composer does not already emit — every
+  arbitrary value like `max-w-[30rem]` — silently resolves to nothing. So each plugin has a
+  `src/theme.css` (Tailwind's theme + utilities layers, `@source` scoped to its own tree, **no
+  preflight** — the host already applies that reset), imports it from its plugin entry, and runs
+  `tailwindcss()` in **both** vite configs. `composerPlugin` then lists the emitted stylesheet in
+  `manifest.json#assets` and the host injects it on install. Verify with
+  `grep max-w packages/<name>/out/assets/*.css` after `:bundle` — an empty result means the class is
+  dead in Composer.
 - Tasks are **tag-based**, never per-project: a plugin's `moon.yml` declares `tags`, and each tag
   inherits the matching `/.moon/tasks/tag-<tag>.yml`. Available tags → tasks:
   `typecheck` → `typecheck` · `ts-vite-build` → `build` · `ts-test` → `test`, `test-watch` ·

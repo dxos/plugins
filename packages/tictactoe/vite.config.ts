@@ -2,6 +2,7 @@
 // Copyright 2026 DXOS.org
 //
 
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -17,5 +18,7 @@ export default defineConfig({
   resolve: {
     conditions: ['source', 'module', 'browser', 'development', 'production', 'import'],
   },
-  plugins: [...composerPlugin({ entry: 'src/TicTacToePlugin.tsx' }), react()],
+  // `tailwindcss` compiles src/theme.css into a stylesheet asset; composerPlugin lists it in the
+  // manifest so the host injects it when the plugin is installed.
+  plugins: [...composerPlugin({ entry: 'src/TicTacToePlugin.tsx' }), react(), tailwindcss()],
 });

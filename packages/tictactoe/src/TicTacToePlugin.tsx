@@ -2,6 +2,8 @@
 // Copyright 2026 DXOS.org
 //
 
+import './theme.css';
+
 import { Plugin } from '@dxos/app-framework';
 import { AppActivationEvents, AppPlugin } from '@dxos/app-toolkit';
 

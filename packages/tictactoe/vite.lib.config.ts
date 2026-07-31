@@ -2,6 +2,7 @@
 // Copyright 2026 DXOS.org
 //
 
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
@@ -36,7 +37,9 @@ export default defineConfig({
   resolve: {
     conditions: ['source', 'module', 'browser', 'development', 'production', 'import'],
   },
-  plugins: [react()],
+  // The plugin entry imports its stylesheet, so this build needs the same compiler as the bundle;
+  // without it Tailwind's at-rules reach the CSS minifier unprocessed.
+  plugins: [react(), tailwindcss()],
   build: {
     outDir: 'dist/lib',
     emptyOutDir: true,

@@ -1,7 +1,7 @@
 {
   "name": "@dxos/plugin-tictactoe",
   "version": "0.10.0",
-  "description": "Tic-Tac-Toe plugin for DXOS Composer — standalone community distribution.",
+  "description": "Tic-Tac-Toe plugin for DXOS Composer \u2014 standalone community distribution.",
   "type": "module",
   "imports": {
     "#capabilities": {
@@ -52,6 +52,7 @@
       "default": "./dist/lib/index.js"
     },
     "./assets/PLUGIN.mdl": "./PLUGIN.mdl",
+    "./styles.css": "./dist/lib/plugin-tictactoe.css",
     "./plugin": {
       "source": "./src/plugin.ts",
       "types": "./dist/types/src/plugin.d.ts",
@@ -63,7 +64,7 @@
       "default": "./dist/lib/translations.js"
     }
   },
-  "//": "@dxos/* deps resolve from the `dxos` catalog in the workspace root's pnpm-workspace.yaml — one find-replace there bumps the whole SDK in lockstep. See RELEASING.md.",
+  "//": "@dxos/* deps resolve from the `dxos` catalog in the workspace root's pnpm-workspace.yaml \u2014 one find-replace there bumps the whole SDK in lockstep. See RELEASING.md.",
   "dependencies": {
     "@dxos/app-framework": "catalog:dxos",
     "@dxos/app-toolkit": "catalog:dxos",
@@ -83,10 +84,12 @@
     "@dxos/plugin-client": "catalog:dxos",
     "@dxos/plugin-testing": "catalog:dxos",
     "@storybook/react-vite": "catalog:",
+    "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "storybook": "catalog:",
+    "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

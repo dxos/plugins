@@ -25,8 +25,6 @@ import { TicTacToe } from '#types';
 
 export type TicTacToeArticleProps = GameVariantSurfaceProps;
 
-const BOARD_MAX_INLINE_SIZE = 480;
-
 export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
   const { t } = useTranslation(meta.profile.key);
   const [aiThinking, setAiThinking] = useState(false);
@@ -150,9 +148,7 @@ export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
             role === AppSurface.Section.role && 'aspect-square',
           )}
         >
-          {/* Sized inline because the plugin ships no stylesheet — only utilities Composer already
-              compiled are available to it, which excludes arbitrary Tailwind values. */}
-          <div className='w-full' style={{ maxInlineSize: BOARD_MAX_INLINE_SIZE }}>
+          <div className='w-full max-w-[30rem]'>
             <TicTacToeBoard
               board={board ?? ''}
               size={size ?? 3}
