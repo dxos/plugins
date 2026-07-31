@@ -9,6 +9,12 @@ name: Release
 #
 # Plugins carry independent version lines (`fixed: []`), but share one Version Packages PR, so a
 # release ships whatever accumulated since the last one — independent numbers, coupled timing.
+#
+# npm auth is a trusted publisher (OIDC), not a token: this filename is load-bearing, because each
+# plugin's trusted publisher on npmjs.com names `release.yml`, and publishing from a workflow with any
+# other filename fails OIDC. A plugin npm has never seen has no trusted publisher yet, so it stays
+# `private: true` until someone publishes it once by hand and configures one — enforced in CI by
+# `scripts/check-packages-published.mjs`.
 
 on:
   push:
@@ -18,6 +24,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write # npm trusted-publisher OIDC + provenance.
 
 jobs:
   release:
@@ -57,7 +64,7 @@ jobs:
           publish: pnpm exec changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true' # provenance via OIDC; trusted publisher means no NPM_TOKEN.
 
       # npm is the library channel; the registry is what Composer installs from. Both ship the same
       # version, from different build outputs — dist/ for npm, out/ for the registry.

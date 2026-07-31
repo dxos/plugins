@@ -1,6 +1,7 @@
 {
   "name": "@dxos/plugin-tictactoe",
   "version": "0.10.0",
+  "private": true,
   "description": "Tic-Tac-Toe plugin for DXOS Composer \u2014 standalone community distribution.",
   "type": "module",
   "imports": {

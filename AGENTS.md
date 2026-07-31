@@ -131,9 +131,13 @@ whatever accumulated. See [RELEASING.md](./RELEASING.md) for the full flow and t
 
 ## Conventions
 
-- New packages must be `"private": true` until they are ready to publish (plugins reach Composer via
-  `dx registry publish`; npm is the secondary channel). A publishable plugin needs the `ts-vite-build`
-  tag (`:build`, the npm library) and the `vite` tag (`:bundle`, the registry artifact), and its
-  `exports`/`imports` maps must point at what `:build` emits.
+- **New packages stay `"private": true` until npm has seen them.** npm auth is a per-package trusted
+  publisher (OIDC), which cannot exist before the package does — so a publishable plugin npm has never
+  seen fails `changeset publish` and takes the whole release with it. Drop the flag only after the
+  first manual publish and trusted-publisher setup; `pnpm check-packages-published` enforces this in
+  CI. Plugins reach Composer via `dx registry publish`; npm is the secondary channel.
+- A publishable plugin needs the `ts-vite-build` tag (`:build`, the npm library) and the `vite` tag
+  (`:bundle`, the registry artifact), and its `exports`/`imports` maps must point at what `:build`
+  emits.
 - PR titles use Conventional Commits: `feat(tictactoe): …`, `fix: …`, `refactor: …`, `docs: …`.
 - Before committing, run `git status` and account for every modified/untracked file.
