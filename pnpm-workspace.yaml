@@ -43,19 +43,19 @@ catalog:
 
 catalogs:
   dxos:
-    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@6be8009'
-    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@6be8009'
-    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@6be8009'
-    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@6be8009'
-    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@6be8009'
-    '@dxos/eslint-plugin-rules': 'https://pkg.pr.new/dxos/dxos/@dxos/eslint-plugin-rules@6be8009'
-    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@6be8009'
-    '@dxos/plugin-client': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-client@6be8009'
-    '@dxos/plugin-game': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-game@6be8009'
-    '@dxos/plugin-testing': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-testing@6be8009'
-    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@6be8009'
-    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@6be8009'
-    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@6be8009'
+    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@e7f0d9e'
+    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@e7f0d9e'
+    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@e7f0d9e'
+    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@e7f0d9e'
+    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@e7f0d9e'
+    '@dxos/eslint-plugin-rules': 'https://pkg.pr.new/dxos/dxos/@dxos/eslint-plugin-rules@e7f0d9e'
+    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@e7f0d9e'
+    '@dxos/plugin-client': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-client@e7f0d9e'
+    '@dxos/plugin-game': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-game@e7f0d9e'
+    '@dxos/plugin-testing': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-testing@e7f0d9e'
+    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@e7f0d9e'
+    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@e7f0d9e'
+    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@e7f0d9e'
 
 # pnpm 10 blocks dependency build scripts by default. `better-sqlite3` is a native addon the client
 # loads when a plugin-activation test boots a real client, and without its compiled binding the
