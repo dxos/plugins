@@ -25,12 +25,32 @@ jobs:
       GH_DXOS_BOT_PAT: ${{ secrets.GH_DXOS_BOT_PAT }}
     steps:
       - uses: actions/checkout@v4
+      # dxos publishes to pkg.pr.new per push to main under `cancel-in-progress`, so a commit
+      # superseded while its (workspace-wide) build is still running never publishes anything.
+      # Pinning `main`'s tip therefore 404s whenever the newest commit is one of those, which is why
+      # this walks back to the newest commit that actually has artifacts.
+      #
       # Seven characters exactly: pkg.pr.new emits 7-char SHAs in the @dxos/* cross-package
       # dependency URLs, and pnpm keys resolutions on the literal URL — a longer pin resolves
       # to the same build but installs a second, duplicate copy of the whole SDK.
-      - name: Resolve latest dxos main commit
+      - name: Resolve latest dxos main commit with published artifacts
         id: sha
-        run: echo "sha=$(git ls-remote https://github.com/dxos/dxos.git refs/heads/main | cut -c1-7)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Any one @dxos package stands in for the rest: a publish run uploads them together.
+          canary=@dxos/app-toolkit
+          for sha in $(gh api 'repos/dxos/dxos/commits?sha=main&per_page=30' --jq '.[].sha' | cut -c1-7); do
+            if curl -sfI "https://pkg.pr.new/dxos/dxos/${canary}@${sha}" >/dev/null; then
+              echo "Resolved dxos/main@${sha} (newest commit with pkg.pr.new artifacts)."
+              echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "No artifacts for ${sha}; trying the previous commit."
+          done
+          echo "::error::No pkg.pr.new artifacts for any of the last 30 dxos/main commits." \
+            "The dxos pkg.pr.new workflow is most likely failing — check its recent runs."
+          exit 1
       # The catalog is repinned before installing, so setup only provisions the toolchain here.
       - uses: ./.github/actions/setup
         with:
