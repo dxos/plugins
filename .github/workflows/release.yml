@@ -112,6 +112,9 @@ jobs:
           ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
           ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
         run: |
+          # node comes from proto, whose global bin is not on PATH, so a `-g` install lands somewhere
+          # the shell will not find. npm reports the prefix it is about to install into, so ask it.
+          export PATH="$(npm prefix -g)/bin:${PATH}"
           npm install -g "${DX_CLI_PACKAGE}"
           # Fail fast on a broken CLI rather than part-way through publishing.
           dx --version
