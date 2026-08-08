@@ -14,16 +14,28 @@
 // publisher are set up together (see AGENTS.md).
 //
 
-import { publishablePackages } from './workspace.mjs';
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { relative } from 'node:path';
 
 const NPM_REGISTRY = 'https://registry.npmjs.org';
 const RETRIES = 2;
 
-const publishable = publishablePackages().map(({ name, dir, manifest }) => ({
-  name,
-  file: `${dir}/package.json`,
-  repository: manifest.repository,
-}));
+// pnpm owns which directories are packages (the `packages` glob in pnpm-workspace.yaml) and reports
+// the `private` flag, so neither has to be re-derived here — and the workspace root, being private,
+// drops out with everything else not meant for npm.
+const workspace = JSON.parse(
+  execFileSync('pnpm', ['list', '--recursive', '--depth=-1', '--json'], { encoding: 'utf8' }),
+);
+
+const publishable = workspace
+  .filter((project) => project.name && !project.private)
+  .map((project) => ({
+    name: project.name,
+    file: `${relative(process.cwd(), project.path)}/package.json`,
+    repository: JSON.parse(readFileSync(`${project.path}/package.json`, 'utf8')).repository,
+  }))
+  .sort((left, right) => left.name.localeCompare(right.name));
 
 // npm verifies a provenance statement against the published `repository.url`, so a package without
 // one is rejected at publish time (E422) after the signature has already been logged — and the

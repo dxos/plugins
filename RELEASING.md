@@ -15,7 +15,7 @@ tsconfig.base.json     # shared compiler options (each plugin extends it)
 .prototools            # pinned toolchain (proto/moon/node/pnpm), matching the dxos monorepo
 .moon/                 # workspace.yml, toolchains.yml, tasks.yml (shared build/typecheck/dev/preview)
 .changeset/            # pending changesets
-scripts/               # set-sdk.mjs, changeset-all.mjs, release-dirs.mjs, check-packages-published.mjs
+scripts/               # set-sdk.mjs, changeset-all.mjs, check-packages-published.mjs
 ```
 
 Each plugin's `@dxos/*` deps resolve from `catalog:dxos`, so the whole SDK moves as one unit.

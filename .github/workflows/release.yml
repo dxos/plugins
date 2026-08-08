@@ -116,7 +116,19 @@ jobs:
           # Fail fast on a broken CLI rather than part-way through publishing.
           dx --version
 
-          node scripts/release-dirs.mjs
+          # pnpm resolves the workspace glob and reports `private`, so the publishable set never has
+          # to be re-derived here. A `registry_only` retry takes all of them, since `publishedPackages`
+          # is empty in a run that published nothing.
+          pnpm list --recursive --depth=-1 --json \
+            | jq -r --argjson all "${ALL:-false}" --argjson published "${PUBLISHED:-[]}" '
+                ($published | map(.name)) as $names
+                | .[]
+                | select(.name and (.private | not))
+                | select($all or (.name as $name | $names | any(. == $name)))
+                | .path
+              ' > released-dirs.txt
+
+          echo "Publishing $(grep -c . released-dirs.txt || true) plugin(s) to the registry."
 
           while read -r dir; do
             [ -n "${dir}" ] || continue
