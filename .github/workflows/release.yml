@@ -103,11 +103,11 @@ jobs:
         if: ${{ inputs.registry_only || steps.changesets.outputs.published == 'true' }}
         env:
           ALL: ${{ inputs.registry_only }}
-          # Pinned to a pkg.pr.new preview: npm's @dxos/cli@0.10.0 is broken (its binary embeds an
-          # absolute path to the machine that built it). Override with the DX_CLI_PACKAGE repo
+          # Pinned to a pkg.pr.new preview: npm's @dxos/cli@0.10.0 cannot read a dx.config.ts from a
+          # plugin directory (fixed in dxos/dxos#12514). Override with the DX_CLI_PACKAGE repo
           # variable, and drop the default once a working CLI is on npm. Installing the single
           # linux-x64 package rather than the launcher avoids fetching all five platforms.
-          DX_CLI_PACKAGE: ${{ vars.DX_CLI_PACKAGE || 'https://pkg.pr.new/dxos/dxos/@dxos/cli-linux-x64@4fb6037' }}
+          DX_CLI_PACKAGE: ${{ vars.DX_CLI_PACKAGE || 'https://pkg.pr.new/dxos/dxos/@dxos/cli-linux-x64@ba08e65' }}
           PUBLISHED: ${{ steps.changesets.outputs.publishedPackages }}
           ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
           ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
