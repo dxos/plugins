@@ -14,24 +14,16 @@
 // publisher are set up together (see AGENTS.md).
 //
 
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { publishablePackages } from './workspace.mjs';
 
 const NPM_REGISTRY = 'https://registry.npmjs.org';
 const RETRIES = 2;
 
-const publishable = readdirSync('packages')
-  .map((dir) => `packages/${dir}/package.json`)
-  .filter((file) => existsSync(file))
-  .flatMap((file) => {
-    let pkg;
-    try {
-      pkg = JSON.parse(readFileSync(file, 'utf8'));
-    } catch {
-      return [];
-    }
-
-    return !pkg.name || pkg.private ? [] : [{ file, name: pkg.name, repository: pkg.repository }];
-  });
+const publishable = publishablePackages().map(({ name, dir, manifest }) => ({
+  name,
+  file: `${dir}/package.json`,
+  repository: manifest.repository,
+}));
 
 // npm verifies a provenance statement against the published `repository.url`, so a package without
 // one is rejected at publish time (E422) after the signature has already been logged — and the
@@ -58,7 +50,7 @@ if (misdeclared.length > 0) {
   console.error(`Set \`repository.url\` in each package.json to ${expected ?? 'this repository'}`);
   console.error('(the `git+https://….git` form is fine — npm normalises it). See RELEASING.md.');
   console.error('');
-  for (const { name, file, repository } of misdeclared.sort((a, b) => a.name.localeCompare(b.name))) {
+  for (const { name, file, repository } of misdeclared) {
     console.error(`  ${name} (${file}) — repository.url is ${JSON.stringify(repository?.url ?? null)}`);
   }
   process.exit(1);
@@ -97,7 +89,7 @@ if (unpublished.length > 0) {
   console.error('Set `"private": true` until the first publish, then configure npm trusted publishing');
   console.error('(OIDC) for the package and drop the flag. See AGENTS.md.');
   console.error('');
-  for (const { name, file } of unpublished.sort((a, b) => a.name.localeCompare(b.name))) {
+  for (const { name, file } of unpublished) {
     console.error(`  ${name} (${file})`);
   }
   process.exit(1);

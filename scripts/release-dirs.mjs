@@ -13,27 +13,15 @@
 //                     put on npm.
 //
 
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 
-const all = process.env.ALL === 'true';
+import { publishablePackages } from './workspace.mjs';
 
-const publishable = readdirSync('packages')
-  .map((dir) => ({ dir: `packages/${dir}`, file: `packages/${dir}/package.json` }))
-  .filter(({ file }) => existsSync(file))
-  .flatMap((entry) => {
-    let pkg;
-    try {
-      pkg = JSON.parse(readFileSync(entry.file, 'utf8'));
-    } catch {
-      return [];
-    }
-
-    return !pkg.name || pkg.private ? [] : [{ ...entry, name: pkg.name, version: pkg.version }];
-  });
+const packages = publishablePackages();
 
 let selected;
-if (all) {
-  selected = publishable;
+if (process.env.ALL === 'true') {
+  selected = packages;
 } else {
   let released;
   try {
@@ -43,10 +31,9 @@ if (all) {
     process.exit(1);
   }
 
-  selected = publishable.filter(({ name }) => released.has(name));
+  selected = packages.filter(({ name }) => released.has(name));
 }
 
-selected.sort((a, b) => a.name.localeCompare(b.name));
 writeFileSync('released-dirs.txt', selected.map(({ dir }) => dir).join('\n'));
 
 if (selected.length === 0) {
