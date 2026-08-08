@@ -18,6 +18,8 @@ if (names.length === 0) {
   process.exit(1);
 }
 
-const frontmatter = names.map((name) => `"${name}": patch`).join('\n');
+// Single-quoted to match oxfmt, which checks `.changeset/*.md` in CI and would otherwise reject
+// the file this script just generated.
+const frontmatter = names.map((name) => `'${name}': patch`).join('\n');
 writeFileSync('.changeset/sdk-release.md', `---\n${frontmatter}\n---\n\n${message}\n`);
 console.log(`Wrote .changeset/sdk-release.md bumping ${names.length} plugin(s).`);
