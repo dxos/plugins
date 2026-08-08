@@ -79,11 +79,17 @@ jobs:
 
   edge:
     runs-on: ubuntu-latest
+    env:
+      DX_HUB_API_KEY: ${{ secrets.DX_HUB_API_KEY }}
     steps:
       - name: Probe /registry/plugins (read) and /registry/upload (gated) per environment
         run: |
           for base in https://edge.dxos.workers.dev https://main.dxos.network https://dxos.network; do
             read_status=$(curl -s -o /dev/null -w '%{http_code}' "${base}/registry/plugins" || echo 'ERR')
             upload_status=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{}' "${base}/registry/upload" || echo 'ERR')
-            echo "${base}  GET /registry/plugins: ${read_status}   POST /registry/upload (unauthenticated): ${upload_status}"
+            keyed_status='<no key set>'
+            if [ -n "${DX_HUB_API_KEY}" ]; then
+              keyed_status=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' -H "X-Admin-Key: ${DX_HUB_API_KEY}" --data '{}' "${base}/registry/upload" || echo 'ERR')
+            fi
+            echo "${base}  GET /registry/plugins: ${read_status}   POST /registry/upload unauthenticated: ${upload_status}   with X-Admin-Key: ${keyed_status}"
           done

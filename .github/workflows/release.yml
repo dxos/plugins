@@ -29,6 +29,9 @@ on:
         description: 'Republish current versions to the registry only, skipping npm. Retries a failed registry publish.'
         type: boolean
         default: false
+      cli_package:
+        description: 'npm spec for the dx CLI, overriding the pinned default — e.g. a pkg.pr.new URL for a branch build.'
+        required: false
 
 permissions:
   contents: write
@@ -107,10 +110,12 @@ jobs:
           # plugin directory (fixed in dxos/dxos#12514). Override with the DX_CLI_PACKAGE repo
           # variable, and drop the default once a working CLI is on npm. Installing the single
           # linux-x64 package rather than the launcher avoids fetching all five platforms.
-          DX_CLI_PACKAGE: ${{ vars.DX_CLI_PACKAGE || 'https://pkg.pr.new/dxos/dxos/@dxos/cli-linux-x64@ba08e65' }}
+          DX_CLI_PACKAGE: ${{ inputs.cli_package || vars.DX_CLI_PACKAGE || 'https://pkg.pr.new/dxos/dxos/@dxos/cli-linux-x64@ba08e65' }}
           PUBLISHED: ${{ steps.changesets.outputs.publishedPackages }}
           ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
           ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
+          # Authenticates the edge upload in place of a hub-identity VP — CI holds no HALO identity.
+          DX_HUB_API_KEY: ${{ secrets.DX_HUB_API_KEY }}
         run: |
           # node comes from proto, whose global bin is not on PATH, so a `-g` install lands somewhere
           # the shell will not find. npm reports the prefix it is about to install into, so ask it.
