@@ -145,11 +145,17 @@ Composer catches up.
     this in CI.
 - `ATPROTO_HANDLE` + `ATPROTO_APP_PASSWORD` — a verified publisher identity for the release workflow
   (or wire `dx account login` for the DPoP path).
-- `GH_DXOS_BOT_PAT` — dxos-bot's PAT (`contents: write` + `pull-requests: write`), used by
-  **SDK nightly** and **SDK npm release** to open their PRs. Without it a PR is authored by
-  `github-actions[bot]`, and GitHub suppresses workflow triggers for `GITHUB_TOKEN`-authored events —
-  so `check.yml` never runs, auto-merge never fires, and the PR sits open (re-pinned nightly, in the
-  nightly's case). Both workflows log a warning when the secret is absent.
+- `GH_DXOS_BOT_PAT` — dxos-bot's PAT (`contents: write` + `pull-requests: write`), used by every
+  workflow that opens a PR: **SDK nightly**, **SDK npm release**, and **Release** (the Version
+  Packages PR). Without it a PR is owned by `github-actions[bot]`, and GitHub's recursion guard
+  applies — `check.yml` either never runs at all or is parked in `action_required` awaiting a manual
+  approval — so auto-merge never fires and the PR sits open. Each workflow logs a warning when the
+  secret is absent.
+  - In `release.yml` the token is the action's `github-token` **input**, and `GITHUB_TOKEN` must stay
+    out of that step's `env`: changesets/action reads `process.env.GITHUB_TOKEN` in preference to the
+    input, so setting both silently reinstates the broken identity. The checkout also sets
+    `persist-credentials: false`, because the credential it would otherwise persist outranks the
+    netrc the action writes and would put the Version PR's commits back on `GITHUB_TOKEN`.
 - The release workflow installs the CLI from `DX_CLI_PACKAGE` (repo variable), defaulting to a
   pkg.pr.new preview because npm's `@dxos/cli@0.10.0` is broken — its binary embeds an absolute path
   to the machine that built it. Point the variable at `@dxos/cli` once a working version is on npm.

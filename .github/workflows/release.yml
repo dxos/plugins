@@ -29,10 +29,17 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      # Exposed so a step condition can branch on token presence: secrets are not allowed in `if:`.
+      GH_DXOS_BOT_PAT: ${{ secrets.GH_DXOS_BOT_PAT }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # changesets/action pushes over a `~/.netrc` it writes from `github-token`, and a persisted
+          # checkout credential outranks netrc (`http.extraheader` is an explicit Authorization
+          # header), which would silently put the Version PR's commits back on GITHUB_TOKEN.
+          persist-credentials: false
 
       - name: Release guard — never publish against an unreleased SDK
         # Matches quoted @dxos/* entry values only, so the guard neither trips on the explanatory
@@ -55,15 +62,26 @@ jobs:
       # in each plugin's dx.config.ts itself.
       - run: moon run :build
 
+      - name: Warn when the bot PAT is missing
+        if: ${{ env.GH_DXOS_BOT_PAT == '' }}
+        run: |
+          echo "::warning::GH_DXOS_BOT_PAT is not set; the Version Packages PR is owned by" \
+            "github-actions[bot], so its checks are parked in action_required until approved by hand." \
+            "See RELEASING.md."
+
       # `changeset publish` pushes to npm and tags each released version; `publishedPackages` then
       # reports exactly what this run released, which drives the registry publish below.
       - id: changesets
         uses: changesets/action@v1
         with:
+          # dxos-bot's PAT, not GITHUB_TOKEN: GitHub's recursion guard parks every `pull_request` run
+          # a GITHUB_TOKEN update triggers in `action_required`, so a GITHUB_TOKEN-owned Version PR
+          # reports zero check runs until a human approves each one by hand. The action reads
+          # `process.env.GITHUB_TOKEN` ahead of this input, so that env var must stay unset here.
+          github-token: ${{ secrets.GH_DXOS_BOT_PAT || secrets.GITHUB_TOKEN }}
           version: pnpm version-packages
           publish: pnpm exec changeset publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true' # provenance via OIDC; trusted publisher means no NPM_TOKEN.
 
       # npm is the library channel; the registry is what Composer installs from. Both ship the same
