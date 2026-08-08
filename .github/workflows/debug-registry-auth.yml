@@ -88,8 +88,11 @@ jobs:
             read_status=$(curl -s -o /dev/null -w '%{http_code}' "${base}/registry/plugins" || echo 'ERR')
             upload_status=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{}' "${base}/registry/upload" || echo 'ERR')
             keyed_status='<no key set>'
+            bearer_status='<no key set>'
             if [ -n "${DX_HUB_API_KEY}" ]; then
               keyed_status=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' -H "X-Admin-Key: ${DX_HUB_API_KEY}" --data '{}' "${base}/registry/upload" || echo 'ERR')
+              # Canonical edgeAuth admin-key form — what the dx CLI's api-key path sends.
+              bearer_status=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' -H "Authorization: Bearer ${DX_HUB_API_KEY}" --data '{}' "${base}/registry/upload" || echo 'ERR')
             fi
-            echo "${base}  GET /registry/plugins: ${read_status}   POST /registry/upload unauthenticated: ${upload_status}   with X-Admin-Key: ${keyed_status}"
+            echo "${base}  GET /registry/plugins: ${read_status}   POST /registry/upload unauthenticated: ${upload_status}   with X-Admin-Key: ${keyed_status}   with Bearer: ${bearer_status}"
           done
