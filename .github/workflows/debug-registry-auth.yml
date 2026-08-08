@@ -1,0 +1,89 @@
+name: Debug registry auth
+
+# TEMPORARY — delete after the registry publish auth is sorted. Separates the release's two auth
+# domains so each can be tested alone, printing only shapes and HTTP status codes, never values:
+#  - atproto: are ATPROTO_HANDLE / ATPROTO_APP_PASSWORD valid credentials for the publisher's PDS?
+#  - edge: which edge environments gate /registry/upload, which is where the release currently 401s
+#    (the upload authenticates with a hub-identity verifiable presentation, not the ATProto secrets).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  atproto:
+    runs-on: ubuntu-latest
+    env:
+      ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
+      ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
+    steps:
+      - name: Secret shape (lengths and whitespace only)
+        run: |
+          node -e '
+            const shape = (name) => {
+              const value = process.env[name] ?? "";
+              console.log(name, JSON.stringify({
+                set: value.length > 0,
+                length: value.length,
+                trimmed: value === value.trim(),
+                startsWithAt: value.startsWith("@"),
+              }));
+            };
+            shape("ATPROTO_HANDLE");
+            shape("ATPROTO_APP_PASSWORD");
+          '
+
+      - name: Resolve the handle (public API)
+        id: resolve
+        run: |
+          handle=$(node -e 'process.stdout.write(encodeURIComponent((process.env.ATPROTO_HANDLE ?? "").trim()))')
+          status=$(curl -s -o /tmp/resolve.json -w '%{http_code}' "https://public.api.bsky.app/xrpc/com.atproto.identity.resolveHandle?handle=${handle}")
+          echo "resolveHandle: HTTP ${status} (200 = handle exists)"
+          did=$(node -e 'try { process.stdout.write(JSON.parse(require("fs").readFileSync("/tmp/resolve.json","utf8")).did ?? "") } catch {}')
+          echo "did: ${did:-<unresolved>}"
+          echo "did=${did}" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve the PDS (plc.directory)
+        id: pds
+        run: |
+          did='${{ steps.resolve.outputs.did }}'
+          pds=""
+          if [ -n "${did}" ]; then
+            curl -s "https://plc.directory/${did}" -o /tmp/plc.json || true
+            pds=$(node -e '
+              try {
+                const doc = JSON.parse(require("fs").readFileSync("/tmp/plc.json","utf8"));
+                const service = (doc.service ?? []).find((entry) => entry.type === "AtprotoPersonalDataServer");
+                process.stdout.write(service?.serviceEndpoint ?? "");
+              } catch {}
+            ')
+          fi
+          echo "pds: ${pds:-<unresolved, falling back to bsky.social>}"
+          echo "pds=${pds:-https://bsky.social}" >> "$GITHUB_OUTPUT"
+
+      - name: createSession (status only — 200 means the secrets are valid)
+        run: |
+          body=$(node -e 'process.stdout.write(JSON.stringify({
+            identifier: (process.env.ATPROTO_HANDLE ?? "").trim(),
+            password: (process.env.ATPROTO_APP_PASSWORD ?? "").trim(),
+          }))')
+          status=$(curl -s -o /tmp/session.json -w '%{http_code}' -X POST \
+            -H 'content-type: application/json' --data "${body}" \
+            '${{ steps.pds.outputs.pds }}/xrpc/com.atproto.server.createSession')
+          echo "createSession: HTTP ${status}"
+          node -e '
+            try {
+              const response = JSON.parse(require("fs").readFileSync("/tmp/session.json","utf8"));
+              console.log("error field:", response.error ?? "(none)");
+            } catch {}
+          '
+
+  edge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe /registry/plugins (read) and /registry/upload (gated) per environment
+        run: |
+          for base in https://edge.dxos.workers.dev https://main.dxos.network https://dxos.network; do
+            read_status=$(curl -s -o /dev/null -w '%{http_code}' "${base}/registry/plugins" || echo 'ERR')
+            upload_status=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{}' "${base}/registry/upload" || echo 'ERR')
+            echo "${base}  GET /registry/plugins: ${read_status}   POST /registry/upload (unauthenticated): ${upload_status}"
+          done
