@@ -15,7 +15,7 @@ tsconfig.base.json     # shared compiler options (each plugin extends it)
 .prototools            # pinned toolchain (proto/moon/node/pnpm), matching the dxos monorepo
 .moon/                 # workspace.yml, toolchains.yml, tasks.yml (shared build/typecheck/dev/preview)
 .changeset/            # pending changesets
-scripts/               # set-sdk.mjs, changeset-all.mjs
+scripts/               # set-sdk.mjs, changeset-all.mjs, check-packages-published.mjs
 ```
 
 Each plugin's `@dxos/*` deps resolve from `catalog:dxos`, so the whole SDK moves as one unit.
@@ -69,6 +69,20 @@ plugin alone, merge the Version PR before adding another plugin's changeset.
 Releases are recorded as git tags rather than a branch — `changeset publish` creates them. A plugin
 that is not yet ready to publish stays `private: true`; `privatePackages.tag` is enabled so those
 are still versioned and tagged.
+
+### Retrying a half-finished release
+
+The two channels can fail independently, and only one of them is replayable by re-running the
+workflow. npm is append-only — `changeset publish` skips versions already on the registry — so once
+npm has accepted a version, a plain re-run finds nothing to publish, reports nothing released, and
+never reaches the registry step. That would leave the registry permanently a version behind with no
+way back short of a version bump.
+
+Dispatch **Release** with `registry_only` to republish the current versions to the registry alone,
+skipping npm entirely. Use it whenever the registry half fails, or after fixing the plugin's
+`dx.config.ts` / bundle. `dx registry publish` rejects an unchanged version, so if a retry reports a
+duplicate the release already landed there — confirm with `dx registry records` and, if a record
+genuinely needs replacing, remove it first with `dx registry unpublish --key <key>`.
 
 ## Keeping up with the SDK
 
@@ -127,12 +141,12 @@ Composer catches up.
 
 ## CI
 
-| Workflow              | Trigger            | Does                                                                              |
-| --------------------- | ------------------ | --------------------------------------------------------------------------------- |
-| `check.yml`           | PR / push / queue  | format, lint, build (npm library), bundle (registry artifact + manifest), test    |
-| `sdk-nightly.yml`     | nightly / dispatch | open/update the SDK upgrade PR from latest pkg.pr.new                             |
-| `sdk-npm-release.yml` | dispatch (version) | pin catalog to npm + release-together changeset → PR                              |
-| `release.yml`         | push to `main`     | Changesets version PR → tag + `dx registry publish` per released plugin (guarded) |
+| Workflow              | Trigger                   | Does                                                                                                                         |
+| --------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `check.yml`           | PR / push / queue         | format, lint, build (npm library), bundle (registry artifact + manifest), test                                               |
+| `sdk-nightly.yml`     | nightly / dispatch        | open/update the SDK upgrade PR from latest pkg.pr.new                                                                        |
+| `sdk-npm-release.yml` | dispatch (version)        | pin catalog to npm + release-together changeset → PR                                                                         |
+| `release.yml`         | push to `main` / dispatch | Changesets version PR → npm + `dx registry publish` per released plugin (guarded); `registry_only` retries the registry half |
 
 ## Secrets / prerequisites
 
@@ -143,6 +157,12 @@ Composer catches up.
     keep it `private: true` until then, or `changeset publish` fails and takes the rest of the release
     with it (the registry publish is gated on its output). `pnpm check-packages-published` enforces
     this in CI.
+  - **Every publishable plugin needs `repository.url` in its `package.json`**, pointing at this
+    repository. Provenance is on (`NPM_CONFIG_PROVENANCE`), and npm validates the signed statement
+    against that field — a missing one is rejected with `E422 … "repository.url" is ""` _after_ the
+    signature has been written to the transparency log, so the release is already lost by the time it
+    surfaces. `pnpm check-packages-published` fails on this too, comparing against
+    `GITHUB_REPOSITORY`.
 - `ATPROTO_HANDLE` + `ATPROTO_APP_PASSWORD` — a verified publisher identity for the release workflow
   (or wire `dx account login` for the DPoP path).
 - `GH_DXOS_BOT_PAT` — dxos-bot's PAT (`contents: write` + `pull-requests: write`), used by every

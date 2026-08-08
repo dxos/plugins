@@ -7,6 +7,10 @@ name: Release
 #  - with none left, publishes the bumped plugins to npm (which also tags each version) and then to
 #    the AT Protocol registry via `dx registry publish`.
 #
+# Dispatching with `registry_only` skips npm and republishes the current versions to the registry, so
+# a registry failure can be retried without a version bump — npm is append-only, so a plain re-run
+# would find its half already done and never reach the registry.
+#
 # Plugins carry independent version lines (`fixed: []`), but share one Version Packages PR, so a
 # release ships whatever accumulated since the last one — independent numbers, coupled timing.
 #
@@ -20,6 +24,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      registry_only:
+        description: 'Republish current versions to the registry only, skipping npm. Retries a failed registry publish.'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -72,6 +81,7 @@ jobs:
       # `changeset publish` pushes to npm and tags each released version; `publishedPackages` then
       # reports exactly what this run released, which drives the registry publish below.
       - id: changesets
+        if: ${{ !inputs.registry_only }}
         uses: changesets/action@v1
         with:
           # dxos-bot's PAT, not GITHUB_TOKEN: GitHub's recursion guard parks every `pull_request` run
@@ -86,9 +96,13 @@ jobs:
 
       # npm is the library channel; the registry is what Composer installs from. Both ship the same
       # version, from different build outputs — dist/ for npm, out/ for the registry.
+      # Runs on a `registry_only` dispatch even though nothing was published in that run: npm is
+      # append-only, so once a version is up the release cannot be replayed to reach the registry
+      # half, and this is the half that talks to two external services.
       - name: Publish released plugins to the registry
-        if: steps.changesets.outputs.published == 'true'
+        if: ${{ inputs.registry_only || steps.changesets.outputs.published == 'true' }}
         env:
+          ALL: ${{ inputs.registry_only }}
           # Pinned to a pkg.pr.new preview: npm's @dxos/cli@0.10.0 is broken (its binary embeds an
           # absolute path to the machine that built it). Override with the DX_CLI_PACKAGE repo
           # variable, and drop the default once a working CLI is on npm. Installing the single
@@ -102,16 +116,19 @@ jobs:
           # Fail fast on a broken CLI rather than part-way through publishing.
           dx --version
 
-          # Publish only what this run released; the registry rejects a re-publish of an unchanged
-          # version, but relying on that would hide a genuine mistake.
-          node -e '
-            const fs = require("fs");
-            const released = new Set(JSON.parse(process.env.PUBLISHED).map((p) => p.name));
-            const dirs = fs.readdirSync("packages")
-              .filter((dir) => fs.existsSync(`packages/${dir}/package.json`))
-              .filter((dir) => released.has(JSON.parse(fs.readFileSync(`packages/${dir}/package.json`, "utf8")).name));
-            fs.writeFileSync("released-dirs.txt", dirs.map((dir) => `packages/${dir}`).join("\n"));
-          '
+          # pnpm resolves the workspace glob and reports `private`, so the publishable set never has
+          # to be re-derived here. A `registry_only` retry takes all of them, since `publishedPackages`
+          # is empty in a run that published nothing.
+          pnpm list --recursive --depth=-1 --json \
+            | jq -r --argjson all "${ALL:-false}" --argjson published "${PUBLISHED:-[]}" '
+                ($published | map(.name)) as $names
+                | .[]
+                | select(.name and (.private | not))
+                | select($all or (.name as $name | $names | any(. == $name)))
+                | .path
+              ' > released-dirs.txt
+
+          echo "Publishing $(grep -c . released-dirs.txt || true) plugin(s) to the registry."
 
           while read -r dir; do
             [ -n "${dir}" ] || continue

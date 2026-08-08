@@ -2,6 +2,11 @@
   "name": "@dxos/plugin-tictactoe",
   "version": "0.10.1",
   "description": "Tic-Tac-Toe plugin for DXOS Composer.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dxos/plugins.git",
+    "directory": "packages/tictactoe"
+  },
   "type": "module",
   "imports": {
     "#capabilities": {

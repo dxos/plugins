@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 //
-// Fails when a publishable plugin has never been published to npm.
+// Fails when a publishable plugin would break `changeset publish` — because npm has never seen it,
+// or because its `repository.url` cannot back a provenance statement.
 //
 // `changeset publish` publishes every non-private package, and npm rejects a first-ever publish that
 // has no trusted publisher configured — which fails the release for every other plugin in the same
@@ -13,24 +14,59 @@
 // publisher are set up together (see AGENTS.md).
 //
 
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { relative } from 'node:path';
 
 const NPM_REGISTRY = 'https://registry.npmjs.org';
 const RETRIES = 2;
 
-const publishable = readdirSync('packages')
-  .map((dir) => `packages/${dir}/package.json`)
-  .filter((file) => existsSync(file))
-  .flatMap((file) => {
-    let pkg;
-    try {
-      pkg = JSON.parse(readFileSync(file, 'utf8'));
-    } catch {
-      return [];
-    }
+// pnpm owns which directories are packages (the `packages` glob in pnpm-workspace.yaml) and reports
+// the `private` flag, so neither has to be re-derived here — and the workspace root, being private,
+// drops out with everything else not meant for npm.
+const workspace = JSON.parse(
+  execFileSync('pnpm', ['list', '--recursive', '--depth=-1', '--json'], { encoding: 'utf8' }),
+);
 
-    return !pkg.name || pkg.private ? [] : [{ file, name: pkg.name }];
-  });
+const publishable = workspace
+  .filter((project) => project.name && !project.private)
+  .map((project) => ({
+    name: project.name,
+    file: `${relative(process.cwd(), project.path)}/package.json`,
+    repository: JSON.parse(readFileSync(`${project.path}/package.json`, 'utf8')).repository,
+  }))
+  .sort((left, right) => left.name.localeCompare(right.name));
+
+// npm verifies a provenance statement against the published `repository.url`, so a package without
+// one is rejected at publish time (E422) after the signature has already been logged — and the
+// release is over by then. `git+…`/`.git` are the conventional spelling; npm compares the bare URL.
+const normalize = (url) =>
+  typeof url === 'string'
+    ? url
+        .replace(/^git\+/, '')
+        .replace(/\.git$/, '')
+        .replace(/\/$/, '')
+    : '';
+
+// Set for every GitHub Actions run; locally there is nothing to compare against, so presence alone
+// is checked.
+const expected = process.env.GITHUB_REPOSITORY ? `https://github.com/${process.env.GITHUB_REPOSITORY}` : undefined;
+
+const misdeclared = publishable.filter(({ repository }) => {
+  const url = normalize(repository?.url);
+  return url === '' || (expected !== undefined && url !== expected);
+});
+
+if (misdeclared.length > 0) {
+  console.error('ERROR: these plugins are publishable but cannot produce a valid provenance statement.');
+  console.error(`Set \`repository.url\` in each package.json to ${expected ?? 'this repository'}`);
+  console.error('(the `git+https://….git` form is fine — npm normalises it). See RELEASING.md.');
+  console.error('');
+  for (const { name, file, repository } of misdeclared) {
+    console.error(`  ${name} (${file}) — repository.url is ${JSON.stringify(repository?.url ?? null)}`);
+  }
+  process.exit(1);
+}
 
 const isPublished = async (name) => {
   const url = `${NPM_REGISTRY}/${encodeURIComponent(name)}`;
@@ -65,7 +101,7 @@ if (unpublished.length > 0) {
   console.error('Set `"private": true` until the first publish, then configure npm trusted publishing');
   console.error('(OIDC) for the package and drop the flag. See AGENTS.md.');
   console.error('');
-  for (const { name, file } of unpublished.sort((a, b) => a.name.localeCompare(b.name))) {
+  for (const { name, file } of unpublished) {
     console.error(`  ${name} (${file})`);
   }
   process.exit(1);
