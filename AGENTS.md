@@ -139,6 +139,8 @@ whatever accumulated. See [RELEASING.md](./RELEASING.md) for the full flow and t
   CI. Plugins reach Composer via `dx registry publish`; npm is the secondary channel.
 - A publishable plugin needs the `ts-vite-build` tag (`:build`, the npm library) and the `vite` tag
   (`:bundle`, the registry artifact), and its `exports`/`imports` maps must point at what `:build`
-  emits.
+  emits. It also needs `repository.url` in its `package.json`: npm validates the provenance statement
+  against that field, and rejects the publish without it. `pnpm check-packages-published` enforces
+  both this and the `private` rule above.
 - PR titles use Conventional Commits: `feat(tictactoe): …`, `fix: …`, `refactor: …`, `docs: …`.
 - Before committing, run `git status` and account for every modified/untracked file.

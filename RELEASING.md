@@ -143,6 +143,12 @@ Composer catches up.
     keep it `private: true` until then, or `changeset publish` fails and takes the rest of the release
     with it (the registry publish is gated on its output). `pnpm check-packages-published` enforces
     this in CI.
+  - **Every publishable plugin needs `repository.url` in its `package.json`**, pointing at this
+    repository. Provenance is on (`NPM_CONFIG_PROVENANCE`), and npm validates the signed statement
+    against that field — a missing one is rejected with `E422 … "repository.url" is ""` _after_ the
+    signature has been written to the transparency log, so the release is already lost by the time it
+    surfaces. `pnpm check-packages-published` fails on this too, comparing against
+    `GITHUB_REPOSITORY`.
 - `ATPROTO_HANDLE` + `ATPROTO_APP_PASSWORD` — a verified publisher identity for the release workflow
   (or wire `dx account login` for the DPoP path).
 - `GH_DXOS_BOT_PAT` — dxos-bot's PAT (`contents: write` + `pull-requests: write`), used by every

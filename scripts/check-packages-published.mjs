@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 //
-// Fails when a publishable plugin has never been published to npm.
+// Fails when a publishable plugin would break `changeset publish` — because npm has never seen it,
+// or because its `repository.url` cannot back a provenance statement.
 //
 // `changeset publish` publishes every non-private package, and npm rejects a first-ever publish that
 // has no trusted publisher configured — which fails the release for every other plugin in the same
@@ -29,8 +30,39 @@ const publishable = readdirSync('packages')
       return [];
     }
 
-    return !pkg.name || pkg.private ? [] : [{ file, name: pkg.name }];
+    return !pkg.name || pkg.private ? [] : [{ file, name: pkg.name, repository: pkg.repository }];
   });
+
+// npm verifies a provenance statement against the published `repository.url`, so a package without
+// one is rejected at publish time (E422) after the signature has already been logged — and the
+// release is over by then. `git+…`/`.git` are the conventional spelling; npm compares the bare URL.
+const normalize = (url) =>
+  typeof url === 'string'
+    ? url
+        .replace(/^git\+/, '')
+        .replace(/\.git$/, '')
+        .replace(/\/$/, '')
+    : '';
+
+// Set for every GitHub Actions run; locally there is nothing to compare against, so presence alone
+// is checked.
+const expected = process.env.GITHUB_REPOSITORY ? `https://github.com/${process.env.GITHUB_REPOSITORY}` : undefined;
+
+const misdeclared = publishable.filter(({ repository }) => {
+  const url = normalize(repository?.url);
+  return url === '' || (expected !== undefined && url !== expected);
+});
+
+if (misdeclared.length > 0) {
+  console.error('ERROR: these plugins are publishable but cannot produce a valid provenance statement.');
+  console.error(`Set \`repository.url\` in each package.json to ${expected ?? 'this repository'}`);
+  console.error('(the `git+https://….git` form is fine — npm normalises it). See RELEASING.md.');
+  console.error('');
+  for (const { name, file, repository } of misdeclared.sort((a, b) => a.name.localeCompare(b.name))) {
+    console.error(`  ${name} (${file}) — repository.url is ${JSON.stringify(repository?.url ?? null)}`);
+  }
+  process.exit(1);
+}
 
 const isPublished = async (name) => {
   const url = `${NPM_REGISTRY}/${encodeURIComponent(name)}`;
