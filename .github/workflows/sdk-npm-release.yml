@@ -20,20 +20,38 @@ permissions:
 jobs:
   bump:
     runs-on: ubuntu-latest
+    env:
+      # Exposed so a step condition can branch on token presence: secrets are not allowed in `if:`.
+      GH_DXOS_BOT_PAT: ${{ secrets.GH_DXOS_BOT_PAT }}
     steps:
       - uses: actions/checkout@v4
-      - uses: moonrepo/setup-toolchain@v0
+      # The catalog is repinned before installing, so setup only provisions the toolchain here.
+      - uses: ./.github/actions/setup
+        with:
+          install: 'false'
       - name: Pin the dxos catalog to the npm release
         run: node scripts/set-sdk.mjs npm '${{ inputs.version }}'
+      # Repinning the catalog invalidates the lockfile by design, so this cannot be frozen.
       - run: pnpm install --no-frozen-lockfile
       # Smoke both artifacts against the repinned SDK — the library and the composerPlugin bundle
       # break in different ways.
       - run: moon run :build :bundle
       - name: Add a release-together changeset for every plugin
         run: node scripts/changeset-all.mjs "Rebuild against DXOS SDK ${{ inputs.version }}."
+      # A PR opened with the default GITHUB_TOKEN does not trigger workflows — GitHub suppresses
+      # those events to prevent recursion — so `check.yml` never runs on it and the PR cannot be
+      # merged behind a required check. Authoring as a PAT/App identity makes the `pull_request`
+      # event fire normally.
+      - name: Warn when the bot PAT is missing
+        if: ${{ env.GH_DXOS_BOT_PAT == '' }}
+        run: |
+          echo "::warning::GH_DXOS_BOT_PAT is not set; the PR is authored by github-actions[bot], so no" \
+            "checks run on it. See RELEASING.md."
+
       - name: Open the SDK release PR
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.GH_DXOS_BOT_PAT || secrets.GITHUB_TOKEN }}
           branch: sdk-npm-release
           commit-message: 'chore(sdk): adopt @dxos/* ${{ inputs.version }}'
           title: 'chore(sdk): adopt @dxos/* ${{ inputs.version }} (release all plugins)'
@@ -42,3 +60,17 @@ jobs:
             plugin (release-together). Merging triggers the release workflow to republish all plugins
             against the new SDK. Cut a Composer beta on the same SDK and observe the migration window
             before promoting to stable.
+
+      # A silent failure here leaves the repo on a pkg.pr.new pin, which the release guard refuses to
+      # publish — so the next release is blocked with nothing to point at. The action skips when no
+      # webhook is configured.
+      - name: Notify on failure
+        if: failure()
+        uses: ./.github/actions/notify
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          content: |
+            **SDK npm release failed** — `${{ github.repository }}`
+
+            Adopting `@dxos/* ${{ inputs.version }}`.
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
