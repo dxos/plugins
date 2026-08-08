@@ -70,6 +70,20 @@ Releases are recorded as git tags rather than a branch — `changeset publish` c
 that is not yet ready to publish stays `private: true`; `privatePackages.tag` is enabled so those
 are still versioned and tagged.
 
+### Retrying a half-finished release
+
+The two channels can fail independently, and only one of them is replayable by re-running the
+workflow. npm is append-only — `changeset publish` skips versions already on the registry — so once
+npm has accepted a version, a plain re-run finds nothing to publish, reports nothing released, and
+never reaches the registry step. That would leave the registry permanently a version behind with no
+way back short of a version bump.
+
+Dispatch **Release** with `registry_only` to republish the current versions to the registry alone,
+skipping npm entirely. Use it whenever the registry half fails, or after fixing the plugin's
+`dx.config.ts` / bundle. `dx registry publish` rejects an unchanged version, so if a retry reports a
+duplicate the release already landed there — confirm with `dx registry records` and, if a record
+genuinely needs replacing, remove it first with `dx registry unpublish --key <key>`.
+
 ## Keeping up with the SDK
 
 The SDK ships as one unit; bump it via the `dxos` catalog (one place).
@@ -127,12 +141,12 @@ Composer catches up.
 
 ## CI
 
-| Workflow              | Trigger            | Does                                                                              |
-| --------------------- | ------------------ | --------------------------------------------------------------------------------- |
-| `check.yml`           | PR / push / queue  | format, lint, build (npm library), bundle (registry artifact + manifest), test    |
-| `sdk-nightly.yml`     | nightly / dispatch | open/update the SDK upgrade PR from latest pkg.pr.new                             |
-| `sdk-npm-release.yml` | dispatch (version) | pin catalog to npm + release-together changeset → PR                              |
-| `release.yml`         | push to `main`     | Changesets version PR → tag + `dx registry publish` per released plugin (guarded) |
+| Workflow              | Trigger                   | Does                                                                                                                         |
+| --------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `check.yml`           | PR / push / queue         | format, lint, build (npm library), bundle (registry artifact + manifest), test                                               |
+| `sdk-nightly.yml`     | nightly / dispatch        | open/update the SDK upgrade PR from latest pkg.pr.new                                                                        |
+| `sdk-npm-release.yml` | dispatch (version)        | pin catalog to npm + release-together changeset → PR                                                                         |
+| `release.yml`         | push to `main` / dispatch | Changesets version PR → npm + `dx registry publish` per released plugin (guarded); `registry_only` retries the registry half |
 
 ## Secrets / prerequisites
 
