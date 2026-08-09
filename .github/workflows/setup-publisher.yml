@@ -1,0 +1,82 @@
+name: Setup publisher (one-time)
+
+# NOT part of the release flow — releases never need this. This is a one-time bootstrap for the
+# ATProto account the registry publishes from: run it once when the publisher account changes
+# (i.e. after updating the ATPROTO_HANDLE / ATPROTO_APP_PASSWORD repository secrets), then leave
+# it alone. Re-running is harmless (records are upserts), just pointless.
+#
+# It writes two records on the publisher's PDS:
+#  - `publisher.profile` (rkey `self`) — the human/org metadata shown alongside published plugins.
+#  - `publisher.verification` (rkey = publisher DID, optional) — the attestation the registry
+#    indexer requires before it lists a publisher's plugins. The indexer only honors verifications
+#    authored by the configured curator (`REGISTRY_CURATOR_DID` in dxos/edge); this self-verification
+#    only affects discovery in environments where the publisher account IS the curator (currently
+#    production). In every other environment the curator must run `dx registry verify` with their
+#    own credentials instead.
+
+on:
+  workflow_dispatch:
+    inputs:
+      display_name:
+        description: 'Publisher display name (the human/org name shown in UIs).'
+        required: true
+      bio:
+        description: 'Short publisher bio.'
+        required: false
+      homepage_url:
+        description: 'Publisher homepage URL.'
+        required: false
+      contact:
+        description: 'Contact (email, handle, etc.).'
+        required: false
+      self_verify:
+        description: 'Also write a self-authored publisher.verification (only meaningful where this account is the curator).'
+        type: boolean
+        default: true
+      cli_package:
+        description: 'npm spec for the dx CLI, overriding the pinned default — e.g. a pkg.pr.new URL for a branch build.'
+        required: false
+
+jobs:
+  setup-publisher:
+    runs-on: ubuntu-latest
+    env:
+      # Same pin as release.yml — see the comment there for why and when to drop it.
+      DX_CLI_PACKAGE: ${{ inputs.cli_package || vars.DX_CLI_PACKAGE || 'https://pkg.pr.new/dxos/dxos/@dxos/cli-linux-x64@1edc570' }}
+      ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
+      ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
+    steps:
+      # No checkout: the CLI is self-contained and every input arrives via dispatch, so the job
+      # needs nothing from the repo. The CLI requires node 24 (engines), which the runner image
+      # is not guaranteed to default to.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install the dx CLI
+        run: |
+          # npm's global bin is not necessarily on PATH; npm reports the prefix it installs into.
+          export PATH="$(npm prefix -g)/bin:${PATH}"
+          npm install -g "${DX_CLI_PACKAGE}"
+          dx --version
+          echo "$(npm prefix -g)/bin" >> "$GITHUB_PATH"
+
+      - name: Publish the publisher profile
+        env:
+          DISPLAY_NAME: ${{ inputs.display_name }}
+          BIO: ${{ inputs.bio }}
+          HOMEPAGE_URL: ${{ inputs.homepage_url }}
+          CONTACT: ${{ inputs.contact }}
+        run: |
+          args=(--display-name "${DISPLAY_NAME}")
+          [ -n "${BIO}" ] && args+=(--bio "${BIO}")
+          [ -n "${HOMEPAGE_URL}" ] && args+=(--homepage-url "${HOMEPAGE_URL}")
+          [ -n "${CONTACT}" ] && args+=(--contact "${CONTACT}")
+          dx registry publish-publisher "${args[@]}"
+
+      - name: Self-verify the publisher
+        if: ${{ inputs.self_verify }}
+        env:
+          DISPLAY_NAME: ${{ inputs.display_name }}
+        run: |
+          dx registry verify --subject "${ATPROTO_HANDLE}" --display-name "${DISPLAY_NAME}"
