@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Same pin as release.yml — see the comment there for why and when to drop it.
-      DX_CLI_PACKAGE: ${{ inputs.cli_package || vars.DX_CLI_PACKAGE || 'https://pkg.pr.new/dxos/dxos/@dxos/cli-linux-x64@1edc570' }}
+      DX_CLI_PACKAGE: ${{ inputs.cli_package || vars.DX_CLI_PACKAGE || 'https://pkg.pr.new/dxos/dxos/@dxos/cli-linux-x64@d7b0a3b' }}
       ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
       ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
     steps:
