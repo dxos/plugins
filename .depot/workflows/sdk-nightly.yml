@@ -93,9 +93,8 @@ jobs:
             **SDK nightly failed** — `${{ github.repository }}`
 
             Tracking `dxos/dxos@${{ steps.sha.outputs.sha }}`.
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             A failure here stops SDK tracking. pkg.pr.new artifacts expire (~1-6 months), so a pin
-            left unattended eventually stops installing. If `pnpm install` was the failing step, the
-            external catalog has most likely drifted from what the pinned SDK resolves — see
+            left unattended eventually stops installing. Typecheck errors like `Property '[TypeId]'
+            is missing` mean a second copy of a dependency the SDK also resolves got installed. See
             "External deps the SDK also resolves" in RELEASING.md.
