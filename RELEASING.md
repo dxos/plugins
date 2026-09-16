@@ -118,13 +118,13 @@ pin resolves to the same build while installing a second, duplicate copy of the 
 plugins. The default catalog must hold a version the **pinned** SDK build also resolves; anything else
 installs a second copy, and since Effect and Automerge brand their types nominally, the duplicate
 surfaces as `Property '[TypeId]' is missing` across every schema rather than as a version complaint.
-Check what the pin requires before changing one:
+`scripts/set-sdk.mjs` moves these in step with the pin: it reads the published `package.json` of every
+`@dxos/*` catalog entry and copies their declared versions into the default catalog, and it fails if two
+SDK packages disagree. When editing one by hand, check what the pin requires first:
 
 ```bash
-node -p "require('./node_modules/@dxos/echo/package.json').peerDependencies"
+node -p "require('./node_modules/@dxos/app-framework/package.json').peerDependencies"
 ```
-
-Moving the SDK pin can therefore require moving these in step.
 
 ### Migration window
 

@@ -27,6 +27,12 @@ runs:
           exit 0
         fi
 
+        # Depot run IDs are not GitHub run IDs, so a `github.run_id` link 404s. Depot sets the
+        # dashboard link for the job attempt in the environment instead.
+        if [ -n "${DEPOT_JOB_URL:-}" ]; then
+          CONTENT="${CONTENT%$'\n'}"$'\n\n'"${DEPOT_JOB_URL}"
+        fi
+
         # jq builds the JSON so newlines and any quotes in the message are escaped correctly.
         jq -n --arg content "${CONTENT}" '{content: $content}' \
           | curl -sS -f -X POST -H 'Content-Type: application/json' -d @- "${WEBHOOK_URL}" \

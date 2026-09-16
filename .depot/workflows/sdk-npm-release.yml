@@ -76,4 +76,3 @@ jobs:
             **SDK npm release failed** — `${{ github.repository }}`
 
             Adopting `@dxos/* ${{ steps.sdk.outputs.version || inputs.version || 'latest' }}`.
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
