@@ -5,7 +5,7 @@
 import * as Schema from 'effect/Schema';
 
 import { Annotation, DXN, Obj, Type } from '@dxos/echo';
-import { FormInputAnnotation, HiddenAnnotation } from '@dxos/echo/Annotation';
+import { FormInputAnnotation } from '@dxos/echo/Annotation';
 
 const LEVELS = ['easy', 'medium', 'hard'] as const;
 
@@ -40,13 +40,7 @@ export class State extends Type.makeObject<State>(DXN.make('org.dxos.type.tictac
     level: Level.annotate({
       description: 'AI difficulty level.',
     }).pipe(FormInputAnnotation.set(false), Schema.optional),
-  }).pipe(
-    Annotation.IconAnnotation.set({ icon: 'ph--hash-straight--regular', hue: 'cyan' }),
-    // Implementation detail of the unified `Game` schema (see plugin-chess/Chess.ts for the
-    // same reasoning). Keeps the state out of the navtree's typed branches so an orphaned
-    // state doesn't reappear after the wrapping Game is deleted.
-    HiddenAnnotation.set(true),
-  ),
+  }).pipe(Annotation.IconAnnotation.set({ icon: 'ph--hash-straight--regular', hue: 'cyan' })),
 ) {}
 
 /**
