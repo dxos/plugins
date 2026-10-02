@@ -31,9 +31,26 @@ jobs:
       # Seven characters exactly: pkg.pr.new emits 7-char SHAs in the @dxos/* cross-package
       # dependency URLs, and pnpm keys resolutions on the literal URL — a longer pin resolves
       # to the same build but installs a second, duplicate copy of the whole SDK.
-      - name: Resolve latest dxos main commit
+      #
+      # The tip of main often has no build: release commits are `[skip ci]`, some commits never get
+      # a publish run, and the newest one may still be building. So walk back to the newest commit
+      # pkg.pr.new serves. Only a missing build is skipped here; anything wrong with a build that
+      # does exist still fails in set-sdk.mjs.
+      - name: Resolve latest published dxos main commit
         id: sha
-        run: echo "sha=$(git ls-remote https://github.com/dxos/dxos.git refs/heads/main | cut -c1-7)" >> "$GITHUB_OUTPUT"
+        run: |
+          repo="$RUNNER_TEMP/dxos"
+          git init -q "$repo"
+          git -C "$repo" fetch -q --depth=30 --filter=tree:0 https://github.com/dxos/dxos.git main
+          for sha in $(git -C "$repo" log --format=%H FETCH_HEAD | cut -c1-7); do
+            if curl -sfL -o /dev/null "https://pkg.pr.new/dxos/dxos/@dxos/app-framework@$sha"; then
+              echo "sha=$sha" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "No pkg.pr.new build for dxos/main@$sha, trying the one before it."
+          done
+          echo "::error::None of the last 30 dxos main commits has a pkg.pr.new build."
+          exit 1
       # The catalog is repinned before installing, so setup only provisions the toolchain here.
       - uses: ./.depot/actions/setup
         with:
