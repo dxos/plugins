@@ -28,7 +28,6 @@ export type TicTacToeArticleProps = GameVariantSurfaceProps;
 export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
   const { t } = useTranslation(meta.profile.key);
   const [aiThinking, setAiThinking] = useState(false);
-  const aiTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const boardRef = useRef<string>('');
   const movesRef = useRef<string>('');
 
@@ -72,18 +71,15 @@ export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
     [board, size, moves, isGameOver, aiThinking, state],
   );
 
+  // `aiThinking` stays out of the dependencies: setting it would re-run the effect, whose cleanup cancels the
+  // pending move.
   useEffect(() => {
-    if (!state || !level || isGameOver || aiThinking) {
-      return;
-    }
-
-    const nextTurn = currentTurn(board ?? '');
-    if (nextTurn !== 'O') {
+    if (!state || !level || isGameOver || currentTurn(board ?? '') !== 'O') {
       return;
     }
 
     setAiThinking(true);
-    aiTimeoutRef.current = setTimeout(() => {
+    const timeout = setTimeout(() => {
       const currentBoard = boardRef.current;
       const currentMoves = movesRef.current;
       const currentStatus = checkWin(currentBoard, size ?? 3, winCondition ?? 3);
@@ -112,11 +108,10 @@ export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
     }, 400);
 
     return () => {
-      if (aiTimeoutRef.current) {
-        clearTimeout(aiTimeoutRef.current);
-      }
+      clearTimeout(timeout);
+      setAiThinking(false);
     };
-  }, [board, level, size, winCondition, isGameOver, aiThinking, moves, state]);
+  }, [board, level, size, winCondition, isGameOver, state]);
 
   const handleNewGame = useCallback(() => {
     if (!state) {
