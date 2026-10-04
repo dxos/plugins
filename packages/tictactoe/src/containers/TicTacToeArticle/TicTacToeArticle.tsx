@@ -8,7 +8,7 @@ import { AppSurface } from '@dxos/app-toolkit/ui';
 import { Obj } from '@dxos/echo';
 import { useObject, useResolveRef } from '@dxos/echo-react';
 import { type GameVariantSurfaceProps } from '@dxos/plugin-game/GameCapabilities';
-import { Panel, Toolbar, useTranslation } from '@dxos/react-ui';
+import { Button, Panel, Toolbar, useTranslation } from '@dxos/react-ui';
 import { mx } from '@dxos/ui-theme';
 
 import {
@@ -28,7 +28,6 @@ export type TicTacToeArticleProps = GameVariantSurfaceProps;
 export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
   const { t } = useTranslation(meta.profile.key);
   const [aiThinking, setAiThinking] = useState(false);
-  const aiTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const boardRef = useRef<string>('');
   const movesRef = useRef<string>('');
 
@@ -72,18 +71,15 @@ export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
     [board, size, moves, isGameOver, aiThinking, state],
   );
 
+  // `aiThinking` stays out of the dependencies: setting it would re-run the effect, whose cleanup cancels the
+  // pending move.
   useEffect(() => {
-    if (!state || !level || isGameOver || aiThinking) {
-      return;
-    }
-
-    const nextTurn = currentTurn(board ?? '');
-    if (nextTurn !== 'O') {
+    if (!state || !level || isGameOver || currentTurn(board ?? '') !== 'O') {
       return;
     }
 
     setAiThinking(true);
-    aiTimeoutRef.current = setTimeout(() => {
+    const timeout = setTimeout(() => {
       const currentBoard = boardRef.current;
       const currentMoves = movesRef.current;
       const currentStatus = checkWin(currentBoard, size ?? 3, winCondition ?? 3);
@@ -112,11 +108,10 @@ export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
     }, 400);
 
     return () => {
-      if (aiTimeoutRef.current) {
-        clearTimeout(aiTimeoutRef.current);
-      }
+      clearTimeout(timeout);
+      setAiThinking(false);
     };
-  }, [board, level, size, winCondition, isGameOver, aiThinking, moves, state]);
+  }, [board, level, size, winCondition, isGameOver, state]);
 
   const handleNewGame = useCallback(() => {
     if (!state) {
@@ -135,12 +130,10 @@ export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
 
   return (
     <Panel.Root role={role} classNames='@container'>
-      <Panel.Toolbar asChild>
-        <Toolbar.Root>
-          {isGameOver && <Toolbar.Button onClick={handleNewGame}>{t('new-game.button')}</Toolbar.Button>}
-        </Toolbar.Root>
-      </Panel.Toolbar>
-      <Panel.Content>
+      <Panel.Header>
+        <Toolbar.Root>{isGameOver && <Button onClick={handleNewGame}>{t('new-game.button')}</Button>}</Toolbar.Root>
+      </Panel.Header>
+      <Panel.Body>
         <div
           className={mx(
             'flex items-center justify-center h-full w-full',
@@ -158,7 +151,7 @@ export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
             />
           </div>
         </div>
-      </Panel.Content>
+      </Panel.Body>
     </Panel.Root>
   );
 };
