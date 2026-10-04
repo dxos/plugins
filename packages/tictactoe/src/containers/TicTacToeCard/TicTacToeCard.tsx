@@ -29,9 +29,7 @@ export const TicTacToeCard = ({ variant }: TicTacToeCardProps) => {
   return (
     <Card.Body>
       <Card.Section classNames='aspect-square'>
-        <Card.Row fullWidth>
-          <TicTacToeBoard board={board} size={size} winningCells={winningCells} disabled />
-        </Card.Row>
+        <TicTacToeBoard board={board} size={size} winningCells={winningCells} disabled />
       </Card.Section>
     </Card.Body>
   );

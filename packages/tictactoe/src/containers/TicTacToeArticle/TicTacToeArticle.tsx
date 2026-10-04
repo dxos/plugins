@@ -8,7 +8,7 @@ import { AppSurface } from '@dxos/app-toolkit/ui';
 import { Obj } from '@dxos/echo';
 import { useObject, useResolveRef } from '@dxos/echo-react';
 import { type GameVariantSurfaceProps } from '@dxos/plugin-game/GameCapabilities';
-import { Panel, Toolbar, useTranslation } from '@dxos/react-ui';
+import { Button, Panel, Toolbar, useTranslation } from '@dxos/react-ui';
 import { mx } from '@dxos/ui-theme';
 
 import {
@@ -135,12 +135,10 @@ export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
 
   return (
     <Panel.Root role={role} classNames='@container'>
-      <Panel.Toolbar asChild>
-        <Toolbar.Root>
-          {isGameOver && <Toolbar.Button onClick={handleNewGame}>{t('new-game.button')}</Toolbar.Button>}
-        </Toolbar.Root>
-      </Panel.Toolbar>
-      <Panel.Content>
+      <Panel.Header>
+        <Toolbar.Root>{isGameOver && <Button onClick={handleNewGame}>{t('new-game.button')}</Button>}</Toolbar.Root>
+      </Panel.Header>
+      <Panel.Body>
         <div
           className={mx(
             'flex items-center justify-center h-full w-full',
@@ -158,7 +156,7 @@ export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
             />
           </div>
         </div>
-      </Panel.Content>
+      </Panel.Body>
     </Panel.Root>
   );
 };
