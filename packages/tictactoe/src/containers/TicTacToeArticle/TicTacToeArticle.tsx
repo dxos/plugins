@@ -4,11 +4,12 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { AppSurface } from '@dxos/app-toolkit/ui';
+import * as AppSurface from '@dxos/app-toolkit/AppSurface';
 import { Obj } from '@dxos/echo';
 import { useObject, useResolveRef } from '@dxos/echo-react';
 import { type GameVariantSurfaceProps } from '@dxos/plugin-game/GameCapabilities';
-import { Button, Panel, Toolbar, useTranslation } from '@dxos/react-ui';
+import { Button, Panel, Toolbar } from '@dxos/react-ui';
+import * as UiHooks from '@dxos/react-ui/Hooks';
 import { mx } from '@dxos/ui-theme';
 
 import {
@@ -26,7 +27,7 @@ import { TicTacToe } from '#types';
 export type TicTacToeArticleProps = GameVariantSurfaceProps;
 
 export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
-  const { t } = useTranslation(meta.profile.key);
+  const { t } = UiHooks.useTranslation(meta.profile.key);
   const [aiThinking, setAiThinking] = useState(false);
   const boardRef = useRef<string>('');
   const movesRef = useRef<string>('');
@@ -131,7 +132,9 @@ export const TicTacToeArticle = ({ role, game }: TicTacToeArticleProps) => {
   return (
     <Panel.Root role={role} classNames='@container'>
       <Panel.Header>
-        <Toolbar.Root>{isGameOver && <Button onClick={handleNewGame}>{t('new-game.button')}</Button>}</Toolbar.Root>
+        <Toolbar.Root>
+          {isGameOver && <Button.Root onClick={handleNewGame}>{t('new-game.button')}</Button.Root>}
+        </Toolbar.Root>
       </Panel.Header>
       <Panel.Body>
         <div
