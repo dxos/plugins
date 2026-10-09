@@ -43,20 +43,20 @@ catalog:
 
 catalogs:
   dxos:
-    '@dxos/app-framework': '^0.13.0'
-    '@dxos/app-toolkit': '^0.13.0'
-    '@dxos/compute': '^0.13.0'
-    '@dxos/echo': '^0.13.0'
-    '@dxos/echo-react': '^0.13.0'
-    '@dxos/eslint-plugin-rules': '^0.13.0'
-    '@dxos/log': '^0.13.0'
-    '@dxos/plugin-client': '^0.13.0'
-    '@dxos/plugin-game': '^0.13.0'
-    '@dxos/plugin-testing': '^0.13.0'
-    '@dxos/react-ui': '^0.13.0'
-    '@dxos/storybook-addon-logger': '^0.13.0'
-    '@dxos/ui-theme': '^0.13.0'
-    '@dxos/util': '^0.13.0'
+    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@e1d0984'
+    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@e1d0984'
+    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@e1d0984'
+    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@e1d0984'
+    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@e1d0984'
+    '@dxos/eslint-plugin-rules': 'https://pkg.pr.new/dxos/dxos/@dxos/eslint-plugin-rules@e1d0984'
+    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@e1d0984'
+    '@dxos/plugin-client': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-client@e1d0984'
+    '@dxos/plugin-game': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-game@e1d0984'
+    '@dxos/plugin-testing': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-testing@e1d0984'
+    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@e1d0984'
+    '@dxos/storybook-addon-logger': 'https://pkg.pr.new/dxos/dxos/@dxos/storybook-addon-logger@e1d0984'
+    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@e1d0984'
+    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@e1d0984'
 
 # pnpm 10 blocks dependency build scripts by default. `better-sqlite3` is a native addon the client
 # loads when a plugin-activation test boots a real client, and without its compiled binding the
