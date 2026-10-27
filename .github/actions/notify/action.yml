@@ -27,6 +27,8 @@ runs:
           exit 0
         fi
 
+        CONTENT="${CONTENT%$'\n'}"$'\n\n'"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
         # jq builds the JSON so newlines and any quotes in the message are escaped correctly.
         jq -n --arg content "${CONTENT}" '{content: $content}' \
           | curl -sS -f -X POST -H 'Content-Type: application/json' -d @- "${WEBHOOK_URL}" \
