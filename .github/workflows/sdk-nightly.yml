@@ -1,10 +1,3 @@
-# Depot CI Migration
-# Source: .github/workflows/sdk-nightly.yml
-#
-# Changes made:
-# - Rewrote .github/ path references to .depot/
-# - Changed GitHub runs-on labels to their Depot equivalents
-
 name: SDK nightly (pkg.pr.new)
 # Tracks the latest DXOS `main` build so the monorepo keeps pace with the SDK. Opens/updates a
 # single "SDK upgrade" PR pointing the `dxos` catalog at the latest pkg.pr.new build. These pins
@@ -22,7 +15,7 @@ permissions:
   pull-requests: write
 jobs:
   upgrade:
-    runs-on: depot-ubuntu-latest # was: ubuntu-latest. Mapped standard GitHub runner to Depot equivalent.
+    runs-on: ubuntu-latest
     env:
       # Exposed so a step condition can branch on token presence: secrets are not allowed in `if:`.
       GH_DXOS_BOT_PAT: ${{ secrets.GH_DXOS_BOT_PAT }}
@@ -52,7 +45,7 @@ jobs:
           echo "::error::None of the last 30 dxos main commits has a pkg.pr.new build."
           exit 1
       # The catalog is repinned before installing, so setup only provisions the toolchain here.
-      - uses: ./.depot/actions/setup
+      - uses: ./.github/actions/setup
         with:
           install: 'false'
       - name: Point the dxos catalog at the latest pkg.pr.new build
@@ -103,7 +96,7 @@ jobs:
       # skips when no webhook is configured.
       - name: Notify on failure
         if: failure()
-        uses: ./.depot/actions/notify
+        uses: ./.github/actions/notify
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           content: |

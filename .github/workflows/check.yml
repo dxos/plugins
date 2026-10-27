@@ -1,10 +1,3 @@
-# Depot CI Migration
-# Source: .github/workflows/check.yml
-#
-# Changes made:
-# - Rewrote .github/ path references to .depot/
-# - Changed GitHub runs-on labels to their Depot equivalents
-
 name: Check
 on:
   pull_request:
@@ -15,14 +8,14 @@ on:
     branches: [main, release]
 jobs:
   check:
-    runs-on: depot-ubuntu-latest # was: ubuntu-latest. Mapped standard GitHub runner to Depot equivalent.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           # moon resolves a merge base against the PR's base ref to compute touched files, which a
           # shallow clone cannot do — the base branch is not in the object store.
           fetch-depth: 0
-      - uses: ./.depot/actions/setup
+      - uses: ./.github/actions/setup
       # Formatting first: it is the cheapest check and a single unformatted file fails the job.
       - run: pnpm run format-check
       - run: moon run :lint
@@ -38,12 +31,12 @@ jobs:
   # distinguishable from a red build at a glance. The `test` moon task declares no build dependency —
   # specs import from src — so this runs in parallel with `check`.
   test:
-    runs-on: depot-ubuntu-latest # was: ubuntu-latest. Mapped standard GitHub runner to Depot equivalent.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: ./.depot/actions/setup
+      - uses: ./.github/actions/setup
       - run: moon run :test
   # Advisory (NOT a gate): when a PR changes plugin source but has no `.changeset/*.md`, post/update
   # a single sticky comment; remove it once a changeset is added. A change that needs no release just
@@ -51,7 +44,7 @@ jobs:
   changeset-reminder:
     if: >-
       github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: depot-ubuntu-latest # was: ubuntu-latest. Mapped standard GitHub runner to Depot equivalent.
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write

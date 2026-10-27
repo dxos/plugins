@@ -1,10 +1,3 @@
-# Depot CI Migration
-# Source: .github/workflows/sdk-npm-release.yml
-#
-# Changes made:
-# - Rewrote .github/ path references to .depot/
-# - Changed GitHub runs-on labels to their Depot equivalents
-
 name: SDK npm release
 # Run when DXOS cuts a published npm SDK release. Pins the `dxos` catalog to that npm version and
 # adds a release-together changeset for every plugin, then opens a PR. Merging it triggers the
@@ -22,14 +15,14 @@ permissions:
   pull-requests: write
 jobs:
   bump:
-    runs-on: depot-ubuntu-latest # was: ubuntu-latest. Mapped standard GitHub runner to Depot equivalent.
+    runs-on: ubuntu-latest
     env:
       # Exposed so a step condition can branch on token presence: secrets are not allowed in `if:`.
       GH_DXOS_BOT_PAT: ${{ secrets.GH_DXOS_BOT_PAT }}
     steps:
       - uses: actions/checkout@v4
       # The catalog is repinned before installing, so setup only provisions the toolchain here.
-      - uses: ./.depot/actions/setup
+      - uses: ./.github/actions/setup
         with:
           install: 'false'
       # Resolves the latest release when no version was given, and reports back what it pinned.
@@ -69,7 +62,7 @@ jobs:
       # webhook is configured.
       - name: Notify on failure
         if: failure()
-        uses: ./.depot/actions/notify
+        uses: ./.github/actions/notify
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           content: |
