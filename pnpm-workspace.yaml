@@ -26,7 +26,7 @@ catalog:
   '@types/react': '~19.2.17'
   '@types/react-dom': '~19.2.3'
   '@vitejs/plugin-react': '^6.0.3'
-  effect: '4.0.4'
+  effect: '4.1.5'
   eslint-plugin-import-x: '^4.17.1'
   eslint-plugin-perfectionist: '^5.10.0'
   eslint-plugin-unused-imports: '^4.4.1'
@@ -43,20 +43,20 @@ catalog:
 
 catalogs:
   dxos:
-    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@72a12c0'
-    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@72a12c0'
-    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@72a12c0'
-    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@72a12c0'
-    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@72a12c0'
-    '@dxos/eslint-plugin-rules': 'https://pkg.pr.new/dxos/dxos/@dxos/eslint-plugin-rules@72a12c0'
-    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@72a12c0'
-    '@dxos/plugin-client': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-client@72a12c0'
-    '@dxos/plugin-game': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-game@72a12c0'
-    '@dxos/plugin-testing': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-testing@72a12c0'
-    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@72a12c0'
-    '@dxos/storybook-addon-logger': 'https://pkg.pr.new/dxos/dxos/@dxos/storybook-addon-logger@72a12c0'
-    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@72a12c0'
-    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@72a12c0'
+    '@dxos/app-framework': 'https://pkg.pr.new/dxos/dxos/@dxos/app-framework@0471a3a'
+    '@dxos/app-toolkit': 'https://pkg.pr.new/dxos/dxos/@dxos/app-toolkit@0471a3a'
+    '@dxos/compute': 'https://pkg.pr.new/dxos/dxos/@dxos/compute@0471a3a'
+    '@dxos/echo': 'https://pkg.pr.new/dxos/dxos/@dxos/echo@0471a3a'
+    '@dxos/echo-react': 'https://pkg.pr.new/dxos/dxos/@dxos/echo-react@0471a3a'
+    '@dxos/eslint-plugin-rules': 'https://pkg.pr.new/dxos/dxos/@dxos/eslint-plugin-rules@0471a3a'
+    '@dxos/log': 'https://pkg.pr.new/dxos/dxos/@dxos/log@0471a3a'
+    '@dxos/plugin-client': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-client@0471a3a'
+    '@dxos/plugin-game': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-game@0471a3a'
+    '@dxos/plugin-testing': 'https://pkg.pr.new/dxos/dxos/@dxos/plugin-testing@0471a3a'
+    '@dxos/react-ui': 'https://pkg.pr.new/dxos/dxos/@dxos/react-ui@0471a3a'
+    '@dxos/storybook-addon-logger': 'https://pkg.pr.new/dxos/dxos/@dxos/storybook-addon-logger@0471a3a'
+    '@dxos/ui-theme': 'https://pkg.pr.new/dxos/dxos/@dxos/ui-theme@0471a3a'
+    '@dxos/util': 'https://pkg.pr.new/dxos/dxos/@dxos/util@0471a3a'
 
 # pnpm 10 blocks dependency build scripts by default. `better-sqlite3` is a native addon the client
 # loads when a plugin-activation test boots a real client, and without its compiled binding the
